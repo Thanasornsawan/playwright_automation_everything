@@ -10,10 +10,12 @@
   "devDependencies": {
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.2",
+    "allure-commandline": "^2.32.0",
     "allure-playwright": "^3.0.7"
   },
   "dependencies": {
     "@zealteam/testrail-reporter": "^1.0.15",
+    "oracledb": "^6.7.1",
     "playwright-qase-reporter": "^2.0.16"
   }
 }

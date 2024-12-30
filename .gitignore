@@ -5,3 +5,5 @@ node_modules/
 /playwright/.cache/
 .env
 /logs/
+/allure-results/
+/allure-report/
