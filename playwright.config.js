@@ -10,7 +10,8 @@ const config = {
     timeout: 5000,
   },
   reporter: [
-    ["list"],  
+    ["list"],
+    ["allure-playwright"],
     ['@zealteam/testrail-reporter'],
     [
       'playwright-qase-reporter',
