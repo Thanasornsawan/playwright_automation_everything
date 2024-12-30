@@ -14,3 +14,23 @@ using qase-playwright, see full documentation [qase playwright here](https://git
 **Result after run test case, result sent to Qase** <br/>
 ![qase_dashboard result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/testrun_dashboard_qase.png?raw=true)
 ![qase result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/qase_result.png?raw=true)
+
+## Setup .env configuration
+```sh
+QASE_TESTOPS_API_TOKEN=**your_playwright_token_app_on_qase**
+QASE_TESTOPS_PROJECT=**your_project_code**
+TESTRAIL_API_TOKEN=**your_testrail_token***
+TESTRAIL_USER=**your_email_account_testrail***
+TESTRAIL_BASE_URL=https://**your_testrail_domain**.testrail.io
+```
+
+**Get your qase token from app menu here** <br/>
+![qase token](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/api_key_qase.png?raw=true)
+
+**Get your TestRail api token from your setting menu here** <br/>
+![testrail token](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/api_key_testrail.png?raw=true)
+
+## command to run project
+```sh
+QASE_MODE=testops npx playwright test
+```
