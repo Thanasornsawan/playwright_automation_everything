@@ -18,9 +18,12 @@ Now, you can see postgresql and oracle database running inside Colima like this 
 ![docker run](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/docker_run.png?raw=true)
 
 **How to connect and setup sample data via oracle db** <br/>
+<details>
+    <summary><b>Click to see how to setup oracle db and make sameple data</b></summary>
 
 ![oracle query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/oracle_query.png?raw=true)
 ![oracle query2](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/sample_data.png?raw=true)
+</details>
 
 ## Report integrate with TestRail
 using testrail-reporter, see full documentation [testrail-reporter here](https://github.com/zealous-tech/testrail-reporter/tree/main)<br/>
