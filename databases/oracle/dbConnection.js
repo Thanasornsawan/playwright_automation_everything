@@ -24,3 +24,4 @@ class DatabaseConnection {
   }
 }
 
+module.exports = { DatabaseConnection };
