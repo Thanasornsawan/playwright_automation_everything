@@ -56,6 +56,25 @@ using qase-playwright, see full documentation [qase playwright here](https://git
 ![qase result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/qase_result.png?raw=true)
 </details>
 
+## Report integrate with Allure
+<details>
+    <summary><b>Click to see all Allure results</b></summary>
+
+```sh
+npx allure generate allure-results -o allure-report --clean
+npx allure open allure-report
+```
+
+![allure open](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/allure_open.png?raw=true)
+![allure dashboard](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/allure_dashboard.png?raw=true)
+</details>
+
+**Run test oracle db with playwright and allure report**
+```sh
+npx playwright test tests/database_testcase/oracle_user.spec.js --reporter=allure-playwright
+```
+![run allure](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/run_test_allure_report.png?raw=true)
+
 ## Setup .env configuration
 ```sh
 QASE_TESTOPS_API_TOKEN=**your_playwright_token_app_on_qase**
