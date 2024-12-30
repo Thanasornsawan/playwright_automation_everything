@@ -1,0 +1,19 @@
+{
+  "name": "practice_playwright",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "allure-playwright": "^3.0.7"
+  },
+  "dependencies": {
+    "@zealteam/testrail-reporter": "^1.0.15",
+    "playwright-qase-reporter": "^2.0.16"
+  }
+}
