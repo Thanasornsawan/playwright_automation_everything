@@ -8,7 +8,9 @@ class DatabaseConnection {
         password: 'testpassword',
         connectString: 'localhost:1521/XE',
         poolMin: 1,
-        poolMax: 1
+        poolMax: 1,
+        connectTimeout: 60, // Add timeout in seconds
+        queueTimeout: 60000 // Queue timeout in milliseconds
       });
     }
   }
