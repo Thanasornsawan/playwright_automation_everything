@@ -18,31 +18,36 @@ Now, you can see postgresql and oracle database running inside Colima like this 
 ![docker run](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/docker_run.png?raw=true)
 
 **How to connect and setup sample data via oracle db** <br/>
+
 <details>
-    <summary><b>Click to see how to setup oracle db and make sameple data</b></summary>
+    <summary>Click to see how to setup oracle db and make sameple data</summary>
 
 ![oracle query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/oracle_query.png?raw=true)
 ![oracle query2](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/sample_data.png?raw=true)
 </details>
+<br/>
 
 **How to connect and setup sample data via postgresql db** <br/>
 <details>
-    <summary><b>Click to see how to setup oracle db and make sameple data</b></summary>
+    <summary>Click to see how to setup postgresql db and make sameple data</summary>
 
 ![postgresql setup](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/postgresql_connect.png?raw=true)
 ![postgresql query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/postgresql_data.png?raw=true)
 </details>
+<br/>
 
 **How to setup sample data via mongo db** <br/>
+
 <details>
-    <summary><b>Click to see how to setup mongodb sample data</b></summary>
+    <summary>Click to see how to setup mongodb sample data</summary>
 
 ![mongo query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mongo_query.png?raw=true)
 </details>
+<br/>
 
 **How to setup sample data via mysql db** <br/>
 <details>
-    <summary><b>Click to see how to setup mysql sample data</b></summary>
+    <summary>Click to see how to setup mysql sample data</summary>
 
 ![mysql query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_query.png?raw=true)
 ![mysql query2](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_result.png?raw=true)
@@ -107,7 +112,7 @@ TESTRAIL_BASE_URL=https://**your_testrail_domain**.testrail.io
 **Get your TestRail api token from your setting menu here** <br/>
 ![testrail token](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/api_key_testrail.png?raw=true)
 
-## command to run project
+**command to run project with qase report**
 ```sh
 QASE_MODE=testops npx playwright test
 ```
