@@ -50,6 +50,40 @@ class UserQueries {
     }
   }
 
-}
+  static async getUserOrdersByProductAndPrice(orderList, maxPrice) {
+    const pool = DatabaseConnection.getPool();
+    
+    const query = `
+      SELECT 
+        u.username, 
+        o.order_id, 
+        o.order_date, 
+        p.product_name, 
+        oi.quantity, 
+        p.price, 
+        ROUND(oi.quantity * p.price, 2) AS total_price
+      FROM users u
+      JOIN orders o ON u.user_id = o.user_id
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN products p ON oi.product_id = p.product_id
+      WHERE p.product_name IN (${orderList.map(() => '?').join(', ')}) 
+        AND (oi.quantity * p.price) < ?
+      ORDER BY o.order_date;
+    `;
+    
+    try {
+      const [rows] = await pool.execute(query, [...orderList, maxPrice]);
+      console.log('Query results:', rows);
+      return rows;
+    } catch (error) {
+      console.error('Error executing query:', {
+        query,
+        parameters: [...orderList, maxPrice],
+        error: error.message,
+      });
+      throw error;
+    }
+  }
+}  
 
 module.exports = { UserQueries };

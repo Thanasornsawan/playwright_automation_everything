@@ -33,7 +33,7 @@ test('should retrieve user credentials by site', async ({ page }) => {
   });
 });
 
-test.only('should retrieve user order details', async ({ page }) => {
+test('should retrieve user order details', async ({ page }) => {
   const testUser = testData.testUsers[0];
 
   await allure.step(`Query order details for user: ${testUser.username}`, async () => {
@@ -56,3 +56,23 @@ test.only('should retrieve user order details', async ({ page }) => {
     console.log('Retrieved order details:', orderDetails);
   });
 });
+
+test.only('should retrieve user orders by product and price', async ({ page }) => {
+    const { order_list, order_price_max } = testData; // Access from testData.json
+  
+    await allure.step(`Query user orders for products: ${order_list.join(', ')} with max price: ${order_price_max}`, async () => {
+      const userOrders = await UserQueries.getUserOrdersByProductAndPrice(order_list, order_price_max);
+  
+      // Extract usernames from the query results
+      const usernames = userOrders.map(order => order.username);
+  
+      // Attach usernames to the Allure report
+      allure.attachment('Matched Usernames', JSON.stringify(usernames, null, 2), 'application/json');
+  
+      // Validate usernames (example validation)
+      console.log('Matched Usernames:', usernames);
+  
+      // Example validation: Ensure we retrieve the expected number of usernames
+      expect(usernames.length).toBeGreaterThan(0);
+    });
+});  
