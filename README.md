@@ -45,6 +45,8 @@ Now, you can see postgresql and oracle database running inside Colima like this 
     <summary><b>Click to see how to setup mysql sample data</b></summary>
 
 ![mysql query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_query.png?raw=true)
+![mysql query2](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_result.png?raw=true)
+![mysql query3](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_query_result.png?raw=true)
 </details>
 
 ## Report integrate with TestRail

@@ -17,4 +17,13 @@ class DatabaseConnection {
 
   static async close() {
     if (this.pool) {
-    
+      await this.pool.close();
+    }
+  }
+
+  static async getConnection() {
+    return this.pool.getConnection();
+  }
+}
+
+module.exports = { DatabaseConnection };
