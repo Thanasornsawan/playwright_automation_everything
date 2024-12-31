@@ -32,3 +32,27 @@ test('should retrieve user credentials by site', async ({ page }) => {
       console.log('Retrieved password:', userAccount.password);
   });
 });
+
+test.only('should retrieve user order details', async ({ page }) => {
+  const testUser = testData.testUsers[0];
+
+  await allure.step(`Query order details for user: ${testUser.username}`, async () => {
+    const orderDetails = await UserQueries.getUserOrderDetails();
+
+    // Attach order details as a JSON file in the Allure report
+    allure.attachment('Order Details', JSON.stringify(orderDetails, null, 2), 'application/json');
+
+    // Validate that order details are returned (adjust based on your test data)
+    expect(orderDetails).toBeInstanceOf(Array);
+    expect(orderDetails.length).toBeGreaterThan(0); // Check if there are orders
+
+    // Example: Check if order details contain valid product names and prices
+    orderDetails.forEach(order => {
+      expect(order).toHaveProperty('product_name');
+      expect(order).toHaveProperty('price');
+      expect(order).toHaveProperty('total_price');
+    });
+
+    console.log('Retrieved order details:', orderDetails);
+  });
+});

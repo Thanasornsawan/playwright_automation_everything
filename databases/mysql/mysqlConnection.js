@@ -5,9 +5,9 @@ class DatabaseConnection {
     if (!this.pool) {
       this.pool = mysql.createPool({
         host: 'localhost',
-        port: 3311,
+        port: 3312,
         user: 'testuser',        
-        password: 'testpass', 
+        password: 'testpassword', 
         database: 'testdb',      
         waitForConnections: true,
         connectionLimit: 1,

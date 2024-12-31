@@ -33,6 +33,20 @@ Now, you can see postgresql and oracle database running inside Colima like this 
 ![postgresql query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/postgresql_data.png?raw=true)
 </details>
 
+**How to setup sample data via mongo db** <br/>
+<details>
+    <summary><b>Click to see how to setup mongodb sample data</b></summary>
+
+![mongo query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mongo_query.png?raw=true)
+</details>
+
+**How to setup sample data via mysql db** <br/>
+<details>
+    <summary><b>Click to see how to setup mysql sample data</b></summary>
+
+![mysql query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_query.png?raw=true)
+</details>
+
 ## Report integrate with TestRail
 using testrail-reporter, see full documentation [testrail-reporter here](https://github.com/zealous-tech/testrail-reporter/tree/main)<br/>
 
