@@ -1,0 +1,11 @@
+{
+    "user_account": {
+        "user_account1": {
+            "email": "thanasornsawan.ploy@outlook.com",
+            "password": "AutomateTest1234#"
+        }
+    },
+    "product": {
+        "product_name": "MacBook",
+        "product_id": 43
+    }

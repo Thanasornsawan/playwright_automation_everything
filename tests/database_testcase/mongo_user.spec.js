@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { DatabaseConnection } = require('../../databases/mongo/mongoConnection');
 const { UserQueries } = require('../../databases/mongo/userQueries');
-const testData = require('../../data/testData.json');
+const testData = require('../../data/database/testData.json');
 import * as allure from "allure-js-commons";
 
 test.beforeAll(async () => {
@@ -30,5 +30,3 @@ test('should retrieve user credentials by site', async ({ page }) => {
   
       console.log('Retrieved username:', userAccount.username);
       console.log('Retrieved password:', userAccount.password);
-  });
-});

@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { DatabaseConnection } = require('../../databases/mysql/mysqlConnection');
 const { UserQueries } = require('../../databases/mysql/userQueries');
-const testData = require('../../data/testData.json');
+const testData = require('../../data/database/testData.json');
 import * as allure from "allure-js-commons";
 
 test.beforeAll(async () => {
@@ -74,5 +74,4 @@ test.only('should retrieve user orders by product and price', async ({ page }) =
   
       // Example validation: Ensure we retrieve the expected number of usernames
       expect(usernames.length).toBeGreaterThan(0);
-    });
-});  
+    

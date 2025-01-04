@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { DatabaseConnection } = require('../../databases/oracle/dbConnection');
 const { UserQueries } = require('../../databases/oracle/userQueries');
-const testData = require('../../data/testData.json');
+const testData = require('../../data/database/testData.json');
 import * as allure from "allure-js-commons";
 
 test.beforeAll(async () => {
@@ -26,9 +26,4 @@ test('should retrieve user credentials by site', async ({ page }) => {
       USERNAME: testUser.username,
       PASSWORD: testUser.password,
       SITE: testUser.site
-    });
-
-    console.log('Retrieved username:', userAccount.USERNAME);
-    console.log('Retrieved password:', userAccount.PASSWORD);
-  });
-});
+ 

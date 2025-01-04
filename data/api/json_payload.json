@@ -1,0 +1,104 @@
+{
+    "departments": [
+      {
+        "id": "dept1",
+        "name": "Engineering",
+        "budget": 1000000,
+        "teams": [
+          {
+            "name": "Frontend",
+            "employees": [
+              {
+                "id": 1,
+                "name": "John",
+                "skills": ["JavaScript", "React"],
+                "level": "senior",
+                "projects": ["ProjectA", "ProjectB"]
+              },
+              {
+                "id": 2,
+                "name": "Alice",
+                "skills": ["TypeScript", "Angular"],
+                "level": "mid",
+                "projects": ["ProjectB"]
+              }
+            ],
+            "projects": [
+              {
+                "id": "ProjectA",
+                "status": "active",
+                "priority": 1,
+                "tags": ["web", "critical"]
+              },
+              {
+                "id": "ProjectB",
+                "status": "pending",
+                "priority": 2,
+                "tags": ["mobile"]
+              }
+            ]
+          },
+          {
+            "name": "Backend",
+            "employees": [
+              {
+                "id": 3,
+                "name": "Bob",
+                "skills": ["Python", "Django"],
+                "level": "senior",
+                "projects": ["ProjectC"]
+              },
+              {
+                "id": 4,
+                "name": "Carol",
+                "skills": ["Java", "Spring"],
+                "level": "senior",
+                "projects": ["ProjectC", "ProjectD"]
+              }
+            ],
+            "projects": [
+              {
+                "id": "ProjectC",
+                "status": "active",
+                "priority": 1,
+                "tags": ["api", "critical"]
+              },
+              {
+                "id": "ProjectD",
+                "status": "completed",
+                "priority": 3,
+                "tags": ["database"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "dept2",
+        "name": "Marketing",
+        "budget": 500000,
+        "teams": [
+          {
+            "name": "Digital",
+            "employees": [
+              {
+                "id": 5,
+                "name": "Eve",
+                "skills": ["SEO", "Content"],
+                "level": "mid",
+                "projects": ["ProjectE"]
+              }
+            ],
+            "projects": [
+              {
+                "id": "ProjectE",
+                "status": "active",
+                "priority": 2,
+                "tags": ["digital", "content"]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+}
