@@ -26,4 +26,9 @@ test('should retrieve user credentials by site', async ({ page }) => {
       USERNAME: testUser.username,
       PASSWORD: testUser.password,
       SITE: testUser.site
- 
+    });
+
+    console.log('Retrieved username:', userAccount.USERNAME);
+    console.log('Retrieved password:', userAccount.PASSWORD);
+  });
+});

@@ -74,4 +74,5 @@ test.only('should retrieve user orders by product and price', async ({ page }) =
   
       // Example validation: Ensure we retrieve the expected number of usernames
       expect(usernames.length).toBeGreaterThan(0);
-    
+    });
+});  

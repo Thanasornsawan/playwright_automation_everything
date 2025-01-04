@@ -49,4 +49,70 @@ Now, you can see postgresql and oracle database running inside Colima like this 
 <details>
     <summary>Click to see how to setup mysql sample data</summary>
 
-![mysql query](https
+![mysql query](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_query.png?raw=true)
+![mysql query2](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_result.png?raw=true)
+![mysql query3](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_query_result.png?raw=true)
+![mysql query4](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/query_price_condition.png?raw=true)
+</details>
+
+## Report integrate with TestRail
+using testrail-reporter, see full documentation [testrail-reporter here](https://github.com/zealous-tech/testrail-reporter/tree/main)<br/>
+
+**Result after run test case, result sent to TestRail** <br/>
+<details>
+    <summary><b>Click to see all TestRail results</b></summary>
+
+![testrail result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/testrail_result.png?raw=true)
+![testrail_pass result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/testrail_pass.png?raw=true)
+![testrail_fail result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/testrail_fail.png?raw=true)
+</details>
+
+## Report integrate with Qase
+using qase-playwright, see full documentation [qase playwright here](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#configuration)<br/>
+
+**Result after run test case, result sent to Qase** <br/>
+<details>
+    <summary><b>Click to see all Qase results</b></summary>
+
+![qase_dashboard result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/testrun_dashboard_qase.png?raw=true)
+![qase result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/qase_result.png?raw=true)
+</details>
+
+## Report integrate with Allure
+<details>
+    <summary><b>Click to see all Allure results</b></summary>
+
+```sh
+npx allure generate allure-results -o allure-report --clean
+npx allure open allure-report
+```
+
+![allure open](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/allure_open.png?raw=true)
+![allure dashboard](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/allure_dashboard.png?raw=true)
+</details>
+
+**Run test oracle db with playwright and allure report**
+```sh
+npx playwright test tests/database_testcase/oracle_user.spec.js --reporter=allure-playwright
+```
+![run allure](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/run_test_allure_report.png?raw=true)
+
+## Setup .env configuration
+```sh
+QASE_TESTOPS_API_TOKEN=**your_playwright_token_app_on_qase**
+QASE_TESTOPS_PROJECT=**your_project_code**
+TESTRAIL_API_TOKEN=**your_testrail_token***
+TESTRAIL_USER=**your_email_account_testrail***
+TESTRAIL_BASE_URL=https://**your_testrail_domain**.testrail.io
+```
+
+**Get your qase token from app menu here** <br/>
+![qase token](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/api_key_qase.png?raw=true)
+
+**Get your TestRail api token from your setting menu here** <br/>
+![testrail token](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/api_key_testrail.png?raw=true)
+
+**command to run project with qase report**
+```sh
+QASE_MODE=testops npx playwright test
+```

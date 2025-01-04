@@ -30,3 +30,5 @@ test('should retrieve user credentials by site', async ({ page }) => {
   
       console.log('Retrieved username:', userAccount.username);
       console.log('Retrieved password:', userAccount.password);
+  });
+});

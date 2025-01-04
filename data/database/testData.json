@@ -3,4 +3,9 @@
     {
       "site": "practicesoftwaretesting.com",
       "username": "test@hotmail.com",
-      "password": "Testqapasswor
+      "password": "Testqapassword1#"
+    }
+  ],
+  "order_list": ["Smartphone", "Tablet"],
+  "order_price_max": 1000
+}
