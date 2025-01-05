@@ -8,5 +8,10 @@
     "product": {
         "product_name": "MacBook",
         "product_id": 43
+    },
+    "page_name": {
+        "cart_page": "shopping cart",
+        "wish_page": "wish list",
+        "compare_page": "product comparison"
     }
 }

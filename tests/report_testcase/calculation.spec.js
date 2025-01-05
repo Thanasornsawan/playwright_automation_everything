@@ -1,12 +1,10 @@
 const { test, expect } = require('@playwright/test');
 import { qase } from 'playwright-qase-reporter';
 
-// A simple function for addition
 function add(a, b) {
   return a + b;
 }
 
-// A simple function for subtraction
 function subtract(a, b) {
   return a - b;
 }

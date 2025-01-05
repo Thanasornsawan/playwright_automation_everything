@@ -1,4 +1,3 @@
-// File: utils/LambdaTestApiUtils.js
 class LambdaTestApiUtils {
     constructor(apiContext, loginPayload) {
         this.apiContext = apiContext;

@@ -1,6 +1,7 @@
 const { test, expect, request } = require('@playwright/test');
 const LambdaTestApiUtils = require('../../utils/LambdaTestApiUtils');
 const ProductDetailPage = require('../../web/pages/e-commerce/product_detail_page');
+const CommonPage = require('../../web/pages/e-commerce/common_page');
 const testData = require('../../data/e-commerce/testData.json');
 
 let apiCookies;
@@ -42,16 +43,16 @@ test('Add product to cart and verify in UI', async ({ page }) => {
     await page.context().addCookies(apiCookies);
 
     const productDetailPage = new ProductDetailPage(page);
+    const commonPage = new CommonPage(page);
 
     // Navigate to product page
     const productData = testData.product;
     await page.goto(`https://ecommerce-playground.lambdatest.io/index.php?route=product/product&product_id=${productData.product_id}`);
 
-    // Add product to cart
     await productDetailPage.addToCart();
 
     // Verify toast popup
-    await productDetailPage.verifyToastPopup(productData.product_name);
+    await commonPage.verifyToastPopup(productData.product_name, testData.page_name.cart_page);
 
     // Verify cart icon updates
     await productDetailPage.verifyCartItemCount('1');

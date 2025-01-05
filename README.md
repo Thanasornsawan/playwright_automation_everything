@@ -1,5 +1,43 @@
 # Self-practice playwright
 
+## Re-use login state by login API before jump to any pages
+This practice use website https://ecommerce-playground.lambdatest.io/index.php for testing. <br/>
+At first, we intercept network and check endpoint for login API and payload and then make API request in ``LambdaTestApiUtils.js`` file <br/>
+and then we use ``await page.context().addCookies(apiCookies);`` for add cookie from login API before proceed to any page. <br/>
+In the test script ``lambdatest_product_detail.spec.js``, we only test add product to cart, verify toast popup and total qty in cart<br/>
+
+![lambda ui](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/lambda_product_detail_ui.png?raw=true)
+![lambda result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/lambda_result.png?raw=true)
+
+## Re-use login state by use local storage file before jump to any pages
+This practice use website https://opensource-demo.orangehrmlive.com for testing. <br/>
+At first, we use admin account go to PIM menu to create different role accounts (In our case is testerQA1, testerQA2) <br/>
+
+![orangehrm admin](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/orangehrm_admin.png?raw=true)
+
+Then, we try use employee role account to access privilege page that only admin can do. We can see alert message below.
+
+![orangehrm employee](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/orangehrm_employee.png?raw=true)
+
+First step, we run ``npx playwright test tests/orangehrm/save_states.spec.js --reporter=list`` to make all 3 accounts login <br/>
+the same time with ``Promise.all()`` and saves all login-related data (cookies, localStorage) to thier state file <br/>
+Then, in role_test.spec.js, we use the state file
+
+```javascript
+   const adminTest = test.extend({
+   storageState: '.auth/state-admin.json'
+});
+```
+
+**Using adminTest instead of test:** <br/>
+``adminTest('Admin can access Employee List', ...)`` looks similar to regular test() but with one key difference<br/>
+- Every time you use adminTest, Playwright automatically loads the admin's login state before running the test
+- You don't need to manually log in anymore - the state file handles that
+- ``test.extend()`` in Playwright, creating a customized version of the test function<br/>
+Think of it as saying "I want all tests using this function to have these special settings"<br/>
+
+![orangehrm result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/orangehrm_result.png?raw=true)
+
 ## Database setup
 **if you use mac M1, you might have problem build docker oracle same me, recommend to use colima start docker**
 <br/>
