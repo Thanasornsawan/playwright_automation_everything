@@ -42,4 +42,9 @@ test('Save login states for users', async ({ browser }) => {
           throw error;
         }
       })
-   
+    );
+  } finally {
+    // Clean up contexts
+    await Promise.all(Object.values(contexts).map(context => context.close()));
+  }
+});

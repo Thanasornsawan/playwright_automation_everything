@@ -18,4 +18,17 @@ class LoginPage {
       await this.passwordInput.fill(password);
       await this.loginButton.click();
       
-      // Wait f
+      // Wait for navigation and verify login success
+      await this.page.waitForURL('**/dashboard/index', { timeout: 10000 });
+      
+      // Save the state
+      await this.page.context().storageState({ path: statePath });
+      
+    } catch (error) {
+      console.error(`Failed to login or save state for ${username}:`, error);
+      throw error;
+    }
+  }
+}
+
+module.exports = { LoginPage };
