@@ -11,9 +11,8 @@ const config = {
   },
   reporter: [
     ["list"],
-    ['blob'],
     ['json', { outputFile: 'results.json' }],
-    ['html', { outputDir: 'html-report' }]
+    ['html', { outputDir: 'html-report' }],
     ["allure-playwright"],
     ['@zealteam/testrail-reporter'],
     [
