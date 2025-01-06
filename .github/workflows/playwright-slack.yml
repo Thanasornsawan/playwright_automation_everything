@@ -46,6 +46,13 @@ jobs:
         FAILED_TESTS=$(jq '.results.summary.failed' ctrf/ctrf-report.json)
         DURATION=$(jq '.results.summary.stop - .results.summary.start' ctrf/ctrf-report.json)
 
+        # Convert duration from milliseconds to hours and minutes
+        DURATION_HOURS=$((DURATION_MS / 3600000))
+        DURATION_MINUTES=$(( (DURATION_MS % 3600000) / 60000 ))
+
+        # Format the duration string
+        DURATION="${DURATION_HOURS} hr ${DURATION_MINUTES} min"
+
         echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
         echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
         echo "FAILED_TESTS=$FAILED_TESTS" >> $GITHUB_ENV
