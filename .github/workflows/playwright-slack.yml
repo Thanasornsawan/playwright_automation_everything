@@ -30,21 +30,21 @@ jobs:
     - name: Run Playwright tests
       run: |
         mkdir -p test-results
-        DEBUG=pw:api npx playwright test tests/e-commerce --reporter=json > test-results/test-report.json || true
+        DEBUG=pw:api npx playwright test tests/e-commerce --reporter=playwright-ctrf-json-reporter
       env:
         CI: true
 
     - name: Debug test report
-      run: cat test-results/test-report.json
+      run: cat ctrf/ctrf-report.json
 
     - name: Parse test results
       id: test-results
       run: |
         echo "Parsing test results..."
-        TOTAL_TESTS=$(jq '[.suites[].specs[].tests[]] | length' test-results/test-report.json)
-        PASSED_TESTS=$(jq '[.suites[].specs[].tests[] | select(.results[].status == "passed")] | length' test-results/test-report.json)
-        FAILED_TESTS=$(jq '[.suites[].specs[].tests[] | select(.results[].status == "failed")] | length' test-results/test-report.json)
-        DURATION=$(jq '.stats.duration' test-results/test-report.json)
+        TOTAL_TESTS=$(jq '.results.summary.tests' ctrf/ctrf-report.json)
+        PASSED_TESTS=$(jq '.results.summary.passed' ctrf/ctrf-report.json)
+        FAILED_TESTS=$(jq '.results.summary.failed' ctrf/ctrf-report.json)
+        DURATION=$(jq '.results.summary.stop - .results.summary.start' ctrf/ctrf-report.json)
 
         echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
         echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
