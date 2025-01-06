@@ -29,12 +29,13 @@ jobs:
 
     - name: Run Playwright tests
       run: |
-        DEBUG=pw:api npx playwright test tests/e-commerce --reporter=json > test-report.json || true
+        mkdir -p test-results
+        DEBUG=pw:api npx playwright test tests/e-commerce --reporter=json > test-results/test-report.json || true
       env:
         CI: true
 
-    - name: Check test report
-      run: cat test-report.json
+    - name: Debug test report
+      run: cat test-results/test-report.json
 
     - name: Parse test results
       id: test-results
@@ -61,7 +62,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: playwright-report
-        path: test-results/html-report
+        path: playwright-report
 
     - name: Notify Slack
       run: |
@@ -74,11 +75,11 @@ jobs:
               {
                 "color": "#36a64f",
                 "fields": [
-                  { "title": "Total Tests", "value": "$TOTAL_TESTS", "short": true },
-                  { "title": "Passed", "value": "$PASSED_TESTS", "short": true },
-                  { "title": "Failed", "value": "$FAILED_TESTS", "short": true },
-                  { "title": "Duration", "value": "$DURATION ms", "short": true },
-                  { "title": "Report", "value": "$REPORT_URL", "short": false }
+                  { "title": "Total Tests", "value": "'$TOTAL_TESTS'", "short": true },
+                  { "title": "Passed", "value": "'$PASSED_TESTS'", "short": true },
+                  { "title": "Failed", "value": "'$FAILED_TESTS'", "short": true },
+                  { "title": "Duration", "value": "'$DURATION ms'", "short": true },
+                  { "title": "Report", "value": "'$REPORT_URL'", "short": false }
                 ]
               }
             ]
