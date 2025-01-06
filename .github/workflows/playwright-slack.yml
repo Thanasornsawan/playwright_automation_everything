@@ -40,20 +40,33 @@ jobs:
       id: test-results
       run: |
         echo "Parsing test results..."
-        TOTAL_TESTS=$(jq '.suites | map(.specs | map(.tests | length) | add) | add' test-report.json)
-        PASSED_TESTS=$(jq '.suites | map(.specs | map(.tests | flatten | map(select(.results[].status=="passed")) | length) | add) | add' test-report.json)
-        FAILED_TESTS=$(jq '.suites | map(.specs | map(.tests | flatten | map(select(.results[].status=="failed")) | length) | add) | add' test-report.json)
-        DURATION=$(jq '.suites | map(.specs | map(.tests | flatten | map(.results[].duration) | add) | add) | add' test-report.json)
+        TOTAL_TESTS=$(jq '[.suites[].specs[].tests[]] | length' test-results/test-report.json)
+        PASSED_TESTS=$(jq '[.suites[].specs[].tests[] | select(.results[].status == "passed")] | length' test-results/test-report.json)
+        FAILED_TESTS=$(jq '[.suites[].specs[].tests[] | select(.results[].status == "failed")] | length' test-results/test-report.json)
+        DURATION=$(jq '.stats.duration' test-results/test-report.json)
 
         echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
         echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
         echo "FAILED_TESTS=$FAILED_TESTS" >> $GITHUB_ENV
         echo "DURATION=$DURATION" >> $GITHUB_ENV
+
+        echo "TOTAL_TESTS: $TOTAL_TESTS"
+        echo "PASSED_TESTS: $PASSED_TESTS"
+        echo "FAILED_TESTS: $FAILED_TESTS"
+        echo "DURATION: $DURATION"
       env:
         CI: true
 
+    - name: Upload HTML report
+      uses: actions/upload-artifact@v3
+      with:
+        name: playwright-report
+        path: test-results/html-report
+
     - name: Notify Slack
       run: |
+        REPORT_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
         curl -X POST -H 'Content-type: application/json' \
           --data '{
             "text": "Playwright Test Results",
@@ -64,7 +77,8 @@ jobs:
                   { "title": "Total Tests", "value": "$TOTAL_TESTS", "short": true },
                   { "title": "Passed", "value": "$PASSED_TESTS", "short": true },
                   { "title": "Failed", "value": "$FAILED_TESTS", "short": true },
-                  { "title": "Duration", "value": "$DURATION ms", "short": true }
+                  { "title": "Duration", "value": "$DURATION ms", "short": true },
+                  { "title": "Report", "value": "$REPORT_URL", "short": false }
                 ]
               }
             ]
