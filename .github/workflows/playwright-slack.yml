@@ -1,0 +1,63 @@
+name: Playwright CI with Slack Notification
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  playwright-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22' # Ensure the correct Node.js version for your project
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Playwright tests
+      run: |
+        npx playwright test tests/e-commerce --reporter=json > test-report.json
+        npx playwright show-report # Optional: Opens the HTML report (not for CI)
+    
+    - name: Parse test results
+      id: test-results
+      run: |
+        echo "Parsing test results..."
+        export TOTAL_TESTS=$(cat test-report.json | jq '.suites | map(.tests) | flatten | length')
+        export PASSED_TESTS=$(cat test-report.json | jq '.suites | map(.tests) | flatten | map(select(.status=="passed")) | length')
+        export FAILED_TESTS=$(cat test-report.json | jq '.suites | map(.tests) | flatten | map(select(.status=="failed")) | length')
+        export DURATION=$(cat test-report.json | jq '.duration')
+        echo "::set-output name=total::$TOTAL_TESTS"
+        echo "::set-output name=passed::$PASSED_TESTS"
+        echo "::set-output name=failed::$FAILED_TESTS"
+        echo "::set-output name=duration::$DURATION"
+      env:
+        CI: true
+
+    - name: Notify Slack
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+          --data '{
+            "text": "Playwright Test Results",
+            "attachments": [
+              {
+                "color": "#36a64f",
+                "fields": [
+                  { "title": "Total Tests", "value": "${{ steps.test-results.outputs.total }}", "short": true },
+                  { "title": "Passed", "value": "${{ steps.test-results.outputs.passed }}", "short": true },
+                  { "title": "Failed", "value": "${{ steps.test-results.outputs.failed }}", "short": true },
+                  { "title": "Duration", "value": "${{ steps.test-results.outputs.duration }}ms", "short": true }
+                ]
+              }
+            ]
+          }' ${{ secrets.SLACK_WEBHOOK_URL }}
