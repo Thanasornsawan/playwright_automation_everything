@@ -13,6 +13,7 @@
     "allure-commandline": "^2.32.0",
     "allure-playwright": "^3.0.7",
     "jsonpath": "^1.1.1",
+    "playwright-ctrf-json-reporter": "^0.0.18",
     "playwright-merge-html-reports": "^0.2.8"
   },
   "dependencies": {
