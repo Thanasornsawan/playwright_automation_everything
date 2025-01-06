@@ -40,14 +40,15 @@ jobs:
       id: test-results
       run: |
         echo "Parsing test results..."
-        export TOTAL_TESTS=$(cat test-report.json | jq '.suites | map(.tests) | flatten | length')
-        export PASSED_TESTS=$(cat test-report.json | jq '.suites | map(.tests) | flatten | map(select(.status=="passed")) | length')
-        export FAILED_TESTS=$(cat test-report.json | jq '.suites | map(.tests) | flatten | map(select(.status=="failed")) | length')
-        export DURATION=$(cat test-report.json | jq '.duration')
-        echo "::set-output name=total::$TOTAL_TESTS"
-        echo "::set-output name=passed::$PASSED_TESTS"
-        echo "::set-output name=failed::$FAILED_TESTS"
-        echo "::set-output name=duration::$DURATION"
+        TOTAL_TESTS=$(jq '.suites | map(.specs | map(.tests | length) | add) | add' test-report.json)
+        PASSED_TESTS=$(jq '.suites | map(.specs | map(.tests | flatten | map(select(.results[].status=="passed")) | length) | add) | add' test-report.json)
+        FAILED_TESTS=$(jq '.suites | map(.specs | map(.tests | flatten | map(select(.results[].status=="failed")) | length) | add) | add' test-report.json)
+        DURATION=$(jq '.suites | map(.specs | map(.tests | flatten | map(.results[].duration) | add) | add) | add' test-report.json)
+
+        echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
+        echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
+        echo "FAILED_TESTS=$FAILED_TESTS" >> $GITHUB_ENV
+        echo "DURATION=$DURATION" >> $GITHUB_ENV
       env:
         CI: true
 
@@ -60,10 +61,10 @@ jobs:
               {
                 "color": "#36a64f",
                 "fields": [
-                  { "title": "Total Tests", "value": "${{ steps.test-results.outputs.total }}", "short": true },
-                  { "title": "Passed", "value": "${{ steps.test-results.outputs.passed }}", "short": true },
-                  { "title": "Failed", "value": "${{ steps.test-results.outputs.failed }}", "short": true },
-                  { "title": "Duration", "value": "${{ steps.test-results.outputs.duration }}ms", "short": true }
+                  { "title": "Total Tests", "value": "$TOTAL_TESTS", "short": true },
+                  { "title": "Passed", "value": "$PASSED_TESTS", "short": true },
+                  { "title": "Failed", "value": "$FAILED_TESTS", "short": true },
+                  { "title": "Duration", "value": "$DURATION ms", "short": true }
                 ]
               }
             ]
