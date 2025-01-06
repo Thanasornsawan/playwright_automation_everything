@@ -29,7 +29,6 @@ jobs:
 
     - name: Run Playwright tests
       run: |
-        mkdir -p test-results
         DEBUG=pw:api npx playwright test tests/e-commerce --reporter=playwright-ctrf-json-reporter,html
       env:
         CI: true

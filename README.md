@@ -154,3 +154,21 @@ TESTRAIL_BASE_URL=https://**your_testrail_domain**.testrail.io
 ```sh
 QASE_MODE=testops npx playwright test
 ```
+
+## Github CICD send notification to slack
+**Step 1: Set Up Slack Incoming Webhook**
+1. Go to your Slack workspace.
+2. Navigate to Apps → Search for "Incoming Webhooks."
+3. Set up a new webhook for the channel you want to send notifications to.
+4. Copy the webhook URL.
+
+**Step 2: Store Slack Webhook URL as a GitHub Secret**
+1. Go to your GitHub repository.
+2. Navigate to Settings → Secrets and variables → Actions → New repository secret.
+3. Add a secret:
+- Name: SLACK_WEBHOOK_URL
+- Value: Paste the Slack webhook URL.
+
+![github secret](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/github_secret.png?raw=true)
+![github cicd](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/github_cicd.png?raw=true)
+![slack not](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/slack_noti.png?raw=true)
