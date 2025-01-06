@@ -56,7 +56,7 @@ test('Add product to cart and verify in UI', async ({ page }) => {
     // Wait briefly for cart clearing to complete
     await page.waitForTimeout(2000);
 
-    // Navigate to product page with retry logic
+    // Navigate to product page
     const productData = testData.product;
     await page.goto(
         `https://ecommerce-playground.lambdatest.io/index.php?route=product/product&product_id=${productData.product_id}`,

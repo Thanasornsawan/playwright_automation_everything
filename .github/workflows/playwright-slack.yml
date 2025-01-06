@@ -1,12 +1,14 @@
 name: Playwright CI with Slack Notification
 
+#on:
+#  push:
+#    branches:
+#      - main
+#  pull_request:
+#    branches:
+#      - main
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    workflow_dispatch: # Only runs manually when triggered from the GitHub Actions UI
 
 jobs:
   playwright-tests:
