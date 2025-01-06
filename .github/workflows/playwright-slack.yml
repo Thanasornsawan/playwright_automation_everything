@@ -44,26 +44,39 @@ jobs:
         TOTAL_TESTS=$(jq '.results.summary.tests' ctrf/ctrf-report.json)
         PASSED_TESTS=$(jq '.results.summary.passed' ctrf/ctrf-report.json)
         FAILED_TESTS=$(jq '.results.summary.failed' ctrf/ctrf-report.json)
-        DURATION=$(jq '.results.summary.stop - .results.summary.start' ctrf/ctrf-report.json)
-
-        # Convert duration from milliseconds to hours and minutes
+    
+        # Get start and stop times in milliseconds
+        START_TIME=$(jq '.results.summary.start' ctrf/ctrf-report.json)
+        STOP_TIME=$(jq '.results.summary.stop' ctrf/ctrf-report.json)
+    
+        # Calculate duration in milliseconds
+        DURATION_MS=$((STOP_TIME - START_TIME))
+    
+        # Convert duration to hours, minutes, and seconds
         DURATION_HOURS=$((DURATION_MS / 3600000))
         DURATION_MINUTES=$(( (DURATION_MS % 3600000) / 60000 ))
-
+        DURATION_SECONDS=$(( (DURATION_MS % 60000) / 1000 ))
+    
         # Format the duration string
-        DURATION="${DURATION_HOURS} hr ${DURATION_MINUTES} min"
-
+        if [ $DURATION_HOURS -gt 0 ]; then
+          DURATION="${DURATION_HOURS} hr ${DURATION_MINUTES} min"
+        elif [ $DURATION_MINUTES -gt 0 ]; then
+          DURATION="${DURATION_MINUTES} min ${DURATION_SECONDS} sec"
+        else
+          DURATION="${DURATION_SECONDS} sec"
+        fi
+    
         echo "TOTAL_TESTS=$TOTAL_TESTS" >> $GITHUB_ENV
         echo "PASSED_TESTS=$PASSED_TESTS" >> $GITHUB_ENV
         echo "FAILED_TESTS=$FAILED_TESTS" >> $GITHUB_ENV
         echo "DURATION=$DURATION" >> $GITHUB_ENV
-
+    
         echo "TOTAL_TESTS: $TOTAL_TESTS"
         echo "PASSED_TESTS: $PASSED_TESTS"
         echo "FAILED_TESTS: $FAILED_TESTS"
         echo "DURATION: $DURATION"
       env:
-        CI: true
+        CI: true    
 
     - name: Upload HTML report
       uses: actions/upload-artifact@v3
