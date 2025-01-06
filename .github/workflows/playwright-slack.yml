@@ -69,18 +69,18 @@ jobs:
         REPORT_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
         curl -X POST -H 'Content-type: application/json' \
-          --data '{
-            "text": "Playwright Test Results",
-            "attachments": [
+          --data "{
+            \"text\": \"Playwright Test Results\",
+            \"attachments\": [
               {
-                "color": "#36a64f",
-                "fields": [
-                  { "title": "Total Tests", "value": "'$TOTAL_TESTS'", "short": true },
-                  { "title": "Passed", "value": "'$PASSED_TESTS'", "short": true },
-                  { "title": "Failed", "value": "'$FAILED_TESTS'", "short": true },
-                  { "title": "Duration", "value": "'$DURATION ms'", "short": true },
-                  { "title": "Report", "value": "'$REPORT_URL'", "short": false }
+                \"color\": \"#36a64f\",
+                \"fields\": [
+                  { \"title\": \"Total Tests\", \"value\": \"$TOTAL_TESTS\", \"short\": true },
+                  { \"title\": \"Passed\", \"value\": \"$PASSED_TESTS\", \"short\": true },
+                  { \"title\": \"Failed\", \"value\": \"$FAILED_TESTS\", \"short\": true },
+                  { \"title\": \"Duration\", \"value\": \"$DURATION ms\", \"short\": true },
+                  { \"title\": \"Report\", \"value\": \"$REPORT_URL\", \"short\": false }
                 ]
               }
             ]
-          }' ${{ secrets.SLACK_WEBHOOK_URL }}
+          }" ${{ secrets.SLACK_WEBHOOK_URL }}
