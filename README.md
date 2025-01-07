@@ -172,3 +172,68 @@ QASE_MODE=testops npx playwright test
 ![github secret](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/github_secret.png?raw=true)
 ![github cicd](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/github_cicd.png?raw=true)
 ![slack not](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/slack_noti.png?raw=true)
+
+## Playwright API testing
+
+<details>
+    <summary><b>Click to see API testing detail</b></summary>
+
+**Setup .env configuration**
+```sh
+DB_USER=**your_db_user_same_like_docker_setup**
+DB_PASSWORD=**your_db_password_same_like_docker_setup**
+DB_NAME=ecommerce
+DB_HOST=localhost
+DB_PORT=5432
+JWT_SECRET=**your_API_SECRET_KEY**
+API_SERVER_PORT=3000
+DATABASE_URL=postgres://your_db_user:your_db_password@localhost:5432/ecommerce
+```
+
+After postgresql db on docker running, we can create more database and grant privilege on that database like this <br/>
+** if you noticed my ``docker-compose.yml`` file, the postgresql db was setup with ``db_name: testdb`` for database testing.
+
+```sh
+CREATE DATABASE ecommerce;
+GRANT ALL PRIVILEGES ON DATABASE ecommerce TO testuser;
+```
+
+Install all dependencies need for run API server (Nodejs express) with permanent database sequelize
+```sh
+npm install express sequelize pg pg-hstore jsonwebtoken bcrypt express-validator express-rate-limit helmet dotenv
+```
+
+This file structue is use for API server only
+
+```
+project-root/
+├── models/
+│   ├── index.js
+│   ├── user.js
+│   ├── profile.js
+│   ├── product.js
+│   ├── order.js
+│   ├── orderItem.js
+│   └── review.js
+├── .env
+└── server.js
+```
+
+each models file refer to table name in postgresql, it is database schema for setup via sequelize nodejs <br/>
+and server.js is file that contains all API endpoint for testing. You can run by this command: <br/>
+
+```sh
+node server.js
+```
+
+You can also test API manually via Postman before make the test script
+
+![server run](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/server_run.png?raw=true)
+![postman](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/postman.png?raw=true)
+
+I keep API testing script that use with this Nodejs server 2 versions for review later between POM structure and no POM <br/>
+The API testing contains all methods GET,POST,PUT,PATCH,DELTE and all API need JWT authentication token for perform any activities.
+
+![api page](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/api_page.png?raw=true)
+
+</details>
