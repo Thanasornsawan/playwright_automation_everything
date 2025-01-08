@@ -18,18 +18,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING
+      lastName: DataTypes.STRING,
+      isAdmin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      }
     });
   
     User.associate = (models) => {
-        // Add onDelete: 'CASCADE' to enable cascading delete
         User.hasOne(models.Profile, { onDelete: 'CASCADE' });
         User.hasMany(models.Order, { onDelete: 'CASCADE' });
         User.hasMany(models.Review, { onDelete: 'CASCADE' });
-    
-        // Also ensure that the associated models have cascading delete
         models.Order.hasMany(models.OrderItem, { onDelete: 'CASCADE' });
-      };
+    };
   
     return User;
-  };
+};

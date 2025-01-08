@@ -20,6 +20,8 @@
     "@zealteam/testrail-reporter": "^1.0.15",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "express-validator": "^7.2.1",
@@ -32,6 +34,7 @@
     "pg-hstore": "^2.3.4",
     "playwright-qase-reporter": "^2.0.16",
     "playwright-slack-reporter": "^1.0.0",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "uuid": "^11.0.4"
   }
 }

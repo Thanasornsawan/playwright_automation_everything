@@ -1,0 +1,28 @@
+{
+    "products": [
+      {
+        "name": "Low Stock Product 1",
+        "description": "Test Description",
+        "price": 99.99,
+        "stock": 5,
+        "category": "Test",
+        "tags": ["test"]
+      },
+      {
+        "name": "Medium Stock Product",
+        "description": "Test Description",
+        "price": 99.99,
+        "stock": 15,
+        "category": "Test",
+        "tags": ["test"]
+      },
+      {
+        "name": "Low Stock Product 2",
+        "description": "Test Description",
+        "price": 99.99,
+        "stock": 8,
+        "category": "Test",
+        "tags": ["test"]
+      }
+    ]
+}

@@ -175,6 +175,40 @@ QASE_MODE=testops npx playwright test
 
 ## Playwright API testing
 
+## Test Cases for Admin Authorization
+
+| Test # | Test Name                                    | Test Steps                                                                                                                               | Expectation                                                                                                     | Test Data                       |
+|--------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|---------------------------------|
+| 1      | Deny Regular User Access to Admin Product Creation | 1. Create a regular user. <br>2. Log in as the regular user. <br>3. Attempt to create a product using regular user credentials.          | Status code `403`. <br>Response error: `Unauthorized access`. <br>Message: `This endpoint requires admin privileges`. | `testData.unauthorize_product`, regularUserToken |
+| 2      | Deny Regular User Access to Admin Inventory | 1. Create a regular user. <br>2. Log in as the regular user. <br>3. Attempt to access the admin inventory endpoint using regular credentials. | Status code `403`. <br>Response error: `Unauthorized access`. <br>Message: `This endpoint requires admin privileges`. | regularUserToken                            |
+| 3      | Handle Expired Token Access Attempts        | 1. Generate an expired token for an admin user. <br>2. Attempt to access the admin inventory endpoint using the expired token.          | Status code `401`. <br>Response error: `Token expired`.                                                         | Expired token                  |
+| 4      | Allow Admin Access to Protected Endpoints   | 1. Log in as an admin user. <br>2. Attempt to access the admin inventory endpoint using admin credentials.                               | Valid response containing `lowStockItems`, `threshold`, and `timestamp`.                                        | Admin token                    |
+| 5      | Handle Invalid Tokens                       | 1. Attempt to access the admin inventory endpoint using: <br>- An empty token. <br>- A malformed token. <br>- An expired token.         | Status code `401` for all cases. <br>Response error present.                                                   | Empty, malformed, expired token |
+
+## Test Cases for Admin Inventory Management
+
+| Test # | Test Name                               | Test Steps                                                                                       | Expectation                                                                                         | Test Data            |
+|--------|-----------------------------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------------|
+| 1      | Get Low Stock Items with Default Threshold | 1. Log in as an admin user. <br>2. Retrieve inventory without specifying a threshold.            | Default threshold is `10`. <br>`lowStockItems` length is `2`. <br>Message: `Found 2 products below stock threshold of 10`. | Admin token         |
+| 2      | Get Low Stock Items with Custom Threshold | 1. Log in as an admin user. <br>2. Retrieve inventory with a threshold of `6`.                   | Threshold is `6`. <br>`lowStockItems` length is `1`. <br>Message: `Found 1 products below stock threshold of 6`.          | Admin token, `6`    |
+| 3      | Handle No Items Below Threshold         | 1. Log in as an admin user. <br>2. Retrieve inventory with a threshold of `3`.                   | `lowStockItems` length is `0`. <br>Message: `No products found below stock threshold of 3`.                              | Admin token, `3`    |
+| 4      | Handle Invalid Threshold                | 1. Log in as an admin user. <br>2. Retrieve inventory with an invalid threshold of `-1`.         | Response error: `Invalid threshold`. <br>Message: `Threshold must be a positive number`.                                 | Admin token, `-1`   |
+| 5      | Clean Up Test Products                  | 1. Delete all test products created during the test setup. <br>2. Delete the admin user account. | Products and admin user are deleted successfully.                                                   | Test products, admin user |
+
+## Test Cases for API Method Verification with Orders and User Profiles
+
+| Test # | Test Name                              | Test Steps                                                                                                   | Expectation                                                                                       | Test Data                   |
+|--------|----------------------------------------|-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|-----------------------------|
+| 1      | Create and Verify User Profile         | 1. Register a new user. <br>2. Log in as the user. <br>3. Create a profile using test data. <br>4. Retrieve and verify the profile. | Profile retrieved matches the test data (`userData.profile`).                                    | `userData.profile`          |
+| 2      | Create and Process an Order            | 1. Seed products. <br>2. Create an order with test product IDs. <br>3. Verify order status.                 | Order is created successfully. <br>Order status is `pending`.                                   | `productIds`                |
+| 3      | Update Order Status to Shipped (PATCH) | 1. Update the created order status to `shipped`. <br>2. Verify the updated status.                         | Updated order status is `shipped`.                                                               | `createdOrderId`            |
+| 4      | Update Product Review (PUT)            | 1. Create an initial review. <br>2. Update the review with test data. <br>3. Verify the updated review data. | Updated review comment matches `reviewData.updated.comment`.                                     | `reviewData.updated`        |
+| 5      | Handle Invalid Token Errors            | 1. Attempt to access user profile with an invalid token. <br>2. Verify the response status code is `401`.   | Status code `401`. <br>Response contains error message `Unauthorized access`.                    | `invalid_token`             |
+| 6      | Handle Expired Token Errors            | 1. Generate an expired token. <br>2. Attempt to access user profile. <br>3. Verify the response status code. | Status code `401`. <br>Response contains error message `Token expired`.                          | Expired token               |
+| 7      | Handle Invalid Product ID Errors       | 1. Use a fake product ID. <br>2. Attempt to access the product details. <br>3. Verify the response status.  | Status code `404`. <br>Response contains error message `Product not found`.                      | Fake product ID             |
+| 8      | Handle Invalid Order Creation          | 1. Attempt to create an order with no items. <br>2. Verify the response status code is `400`.               | Status code `400`. <br>Response contains error message `Invalid order: No items provided`.        | `{ items: [] }`             |
+| 9      | Clean Up Test Data                     | 1. Delete all reviews. <br>2. Delete created orders. <br>3. Delete the test user.                           | All test data is cleaned up successfully.                                                        | Test user, reviews, orders  |
+
 <details>
     <summary><b>Click to see API testing detail</b></summary>
 
@@ -203,7 +237,7 @@ Install all dependencies need for run API server (Nodejs express) with permanent
 npm install express sequelize pg pg-hstore jsonwebtoken bcrypt express-validator express-rate-limit helmet dotenv
 ```
 
-This file structue is use for API server only
+The file structue for setup API server:
 
 ```
 project-root/
@@ -215,12 +249,24 @@ project-root/
 │   ├── order.js
 │   ├── orderItem.js
 │   └── review.js
+├── routes/
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   └── validators.js
+│   ├── utils/
+│   │   └── validators.js
+│   ├── admin.routes.js
+│   ├── auth.routes.js
+│   ├── order.routes.js
+│   ├── products.routes.js
+│   └── user.routes.js
+│   └── reviews.routes.js
 ├── .env
 └── server.js
 ```
 
 each models file refer to table name in postgresql, it is database schema for setup via sequelize nodejs <br/>
-and server.js is file that contains all API endpoint for testing. You can run by this command: <br/>
+and server.js is file that contains all API endpoint from routes folder for testing. You can run by this command: <br/>
 
 ```sh
 node server.js
@@ -231,9 +277,37 @@ You can also test API manually via Postman before make the test script
 ![server run](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/server_run.png?raw=true)
 ![postman](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/postman.png?raw=true)
 
-I keep API testing script that use with this Nodejs server 2 versions for review later between POM structure and no POM <br/>
-The API testing contains all methods GET,POST,PUT,PATCH,DELTE and all API need JWT authentication token for perform any activities.
+The file structue for API test cases:
 
-![api page](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/api_page.png?raw=true)
+```
+project-root/
+├── api/
+│   ├── adminPage.js
+│   ├── apiHelper.js
+│   ├── authPage.js
+│   ├── orderPage.js
+│   ├── productPage.js
+│   ├── userProfilePage.js
+│   ├── data/
+│       └── api/
+|            |- json_payload.json
+│   ├── tests/
+│       └── api/
+|            |- admin_authorization.spec.js
+|            |- admin_inventory.spec.js
+|            |- user_order_products.spec.js
+|            |- complex_jsonpath_tests.spec.js
+```
+
+Result after run test each files:
+![admin authorization](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/admin_authorization.png?raw=true)
+![admin inventory](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/admin_inventory.png?raw=true)
+![user order](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/user_order_product.png?raw=true)
+
+Note: 
+- ``user_order_products.spec.js`` focus on API testing with all methods (GET, POST, PUT, PATCH, DELTE) with authenticate user JWT token (normal user)<br/>
+- ``admin_authorization.spec.js`` focus on privilege usage that only admin can access
+- ``admin_inventory.spec.js`` focus on business logic fill stocks with define threshold (positive, negative value, invalid)
+- ``complex_jsonpath_tests.spec.js`` focus on how to filter specific value from complex json body to verify
 
 </details>

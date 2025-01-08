@@ -1,0 +1,10 @@
+{
+    "initial": {
+      "rating": 4,
+      "comment": "Initial comment for the product review"
+    },
+    "updated": {
+      "rating": 5,
+      "comment": "Updated comment for the product review"
+    }
+}

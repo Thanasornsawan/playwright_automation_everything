@@ -14,12 +14,29 @@ class ApiHelper {
     }
 
     async validateResponse(response, expectedStatus) {
-        if (response.status() !== expectedStatus) {
+        // Don't log error response for expected error status codes
+        if (response.status() !== expectedStatus && 
+            !(expectedStatus >= 400 && response.status() === expectedStatus)) {
             const errorBody = await response.json().catch(() => ({}));
             console.error('Error response:', errorBody);
         }
+        
         expect(response.status()).toBe(expectedStatus);
-        return await response.json();
+
+        // Don't try to parse JSON for 204 No Content responses
+        if (expectedStatus === 204) {
+            return null;
+        }
+
+        try {
+            return await response.json();
+        } catch (error) {
+            if (expectedStatus !== 204) {
+                console.error('Error parsing JSON response:', error);
+                throw error;
+            }
+            return null;
+        }
     }
 }
 

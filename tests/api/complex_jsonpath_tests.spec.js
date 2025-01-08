@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const jsonpath = require('jsonpath');
-const testData = require('../../data/api/json_payload.json');
+const testData = require('../../data/api/complex_json_payload.json');
 
 test.describe('Complex JSONPath Examples', () => {
 

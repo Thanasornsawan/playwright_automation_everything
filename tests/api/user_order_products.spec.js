@@ -3,10 +3,12 @@ const AuthPage = require('../../api/authPage');
 const UserProfilePage = require('../../api/userProfilePage');
 const ProductsPage = require('../../api/productPage');
 const OrdersPage = require('../../api/orderPage');
+const userData = require('../../data/api/user_profile_payload.json');
+const reviewData = require('../../data/api/product_review_payload.json');
 
 const BASE_URL = 'http://localhost:3000';
 
-test.describe('Complex API Testing Suite', () => {
+test.describe('Verify API method with order products and user profile', () => {
     let apiContext;
     let authPage, userProfilePage, productsPage, ordersPage;
     let authToken, userId, createdOrderId;
@@ -15,17 +17,15 @@ test.describe('Complex API Testing Suite', () => {
     let firstProductId;
 
     test.beforeAll(async () => {
-        // Create a new API request context
         apiContext = await request.newContext();
         
-        // Initialize pages with the API context
         authPage = new AuthPage(apiContext, BASE_URL);
         userProfilePage = new UserProfilePage(apiContext, BASE_URL);
         productsPage = new ProductsPage(apiContext, BASE_URL);
         ordersPage = new OrdersPage(apiContext, BASE_URL);
 
-        // Register and login
-        const user = authPage.generateTestUser();
+        // Register and login regular user
+        const user = authPage.generateTestUser(false);
         const registerData = await authPage.register(user);
         userId = registerData.userId;
 
@@ -34,8 +34,9 @@ test.describe('Complex API Testing Suite', () => {
             password: user.password
         });
         authToken = loginData.token;
+        expect(loginData.user.isAdmin).toBe(false);
 
-        // Setup products and review
+        // Setup products
         await productsPage.seedProducts(authToken);
         const products = await productsPage.getProducts(authToken);
         
@@ -45,27 +46,19 @@ test.describe('Complex API Testing Suite', () => {
         productIds = products.slice(0, 2).map((p) => p.id);
         firstProductId = productIds[0];
 
+        // Create initial review using test data
         const review = await productsPage.createReview(
             firstProductId,
-            {
-                rating: 4,
-                comment: 'Initial comment for the product review'
-            },
+            reviewData.initial,
             authToken
         );
         reviewId = review.id;
     });
 
     test('should create and verify user profile', async () => {
-        const profileData = {
-            phoneNumber: '+1234567890',
-            address: '123 Test St',
-            preferences: { notifications: true },
-        };
-
-        await userProfilePage.createProfile(userId, profileData, authToken);
+        await userProfilePage.createProfile(userId, userData.profile, authToken);
         const retrievedProfile = await userProfilePage.getProfile(userId, authToken);
-        expect(retrievedProfile).toMatchObject(profileData);
+        expect(retrievedProfile).toMatchObject(userData.profile);
     });
 
     test('should create and process an order', async () => {
@@ -93,17 +86,13 @@ test.describe('Complex API Testing Suite', () => {
         const updatedReview = await productsPage.updateReview(
             firstProductId,
             reviewId,
-            {
-                rating: 5,
-                comment: 'Updated comment for the product review'
-            },
+            reviewData.updated,
             authToken
         );
-        expect(updatedReview.comment).toBe('Updated comment for the product review');
+        expect(updatedReview.comment).toBe(reviewData.updated.comment);
     });
 
     test('should handle error scenarios', async () => {
-        // Create a new request context for error testing
         const errorContext = await request.newContext();
 
         await test.step('should handle invalid token to get user profile with status code 401', async () => {
@@ -116,7 +105,18 @@ test.describe('Complex API Testing Suite', () => {
             expect(invalidResponse.status()).toBe(401);
         });
 
-        await test.step('should handle invalid produc id with status code 404', async () => {
+        await test.step('should handle expired token with status code 401', async () => {
+            const expiredToken = authPage.generateExpiredToken(userId);
+            const expiredResponse = await errorContext.get(
+                `${BASE_URL}/users/${userId}/profile`,
+                {
+                    headers: { Authorization: `Bearer ${expiredToken}` },
+                }
+            );
+            expect(expiredResponse.status()).toBe(401);
+        });
+
+        await test.step('should handle invalid product id with status code 404', async () => {
             const fakeUuid = crypto.randomUUID();
             const notFoundResponse = await errorContext.get(
                 `${BASE_URL}/products/${fakeUuid}`,
@@ -131,9 +131,8 @@ test.describe('Complex API Testing Suite', () => {
             const invalidOrderResponse = await ordersPage.createOrder({ items: [] }, authToken);
             expect(invalidOrderResponse.status).toBe(400);
             expect(invalidOrderResponse.json.error).toBe('Invalid order: No items provided');
+        });
 
-       });
-        // Dispose of the error testing context
         await errorContext.dispose();
     });
 

@@ -1,0 +1,9 @@
+{
+    "profile": {
+      "phoneNumber": "+1234567890",
+      "address": "123 Test St",
+      "preferences": {
+        "notifications": true
+      }
+    }
+}

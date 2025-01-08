@@ -1,0 +1,18 @@
+{
+    "authorize_product": {
+      "name": "Test Product",
+      "description": "Test Description",
+      "price": 99.99,
+      "stock": 50,
+      "category": "Test",
+      "tags": ["test"]
+    },
+    "unauthorize_product": {
+      "name": "Unauthorized Product",
+      "description": "Should not be created",
+      "price": 10.99,
+      "stock": 100,
+      "category": "Test",
+      "tags": ["test"]
+    }
+}  
