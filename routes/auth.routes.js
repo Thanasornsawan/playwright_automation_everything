@@ -73,9 +73,18 @@ router.post('/login', async (req, res, next) => {
 });
 
 router.get('/unauthorized', (req, res) => {
-  res.status(403).json({ 
-    error: 'Unauthorized access',
-    message: 'This endpoint requires admin privileges'
+  res.status(403).json({
+      error: 'Unauthorized access',
+      message: 'This endpoint requires admin privileges',
+      redirected: true
+  });
+});
+
+// Login page endpoint
+router.get('/login', (req, res) => {
+  res.status(200).json({
+      message: 'Please login to continue',
+      redirected: true
   });
 });
 
