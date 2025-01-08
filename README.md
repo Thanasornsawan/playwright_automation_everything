@@ -274,7 +274,7 @@ node server.js
 
 You can also test API manually via Postman before make the test script
 
-![server run](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/server_run.png?raw=true)
+![server run2](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/server_run2.png?raw=true)
 ![postman](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/postman.png?raw=true)
 
 The file structue for API test cases:
