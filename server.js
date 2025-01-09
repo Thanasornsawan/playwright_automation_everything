@@ -13,6 +13,8 @@ const userRoutes = require('./routes/user.routes');
 const productRoutes = require('./routes/products.routes');
 const orderRoutes = require('./routes/order.routes');
 const reviewRoutes = require('./routes/reviews.routes');
+const formImageRoutes = require('./routes/form-image.routes');
+const xmlRoutes = require('./routes/advanced-xml.routes');
 
 // Environment variables
 const PORT = process.env.API_SERVER_PORT || 3000;
@@ -23,6 +25,7 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Rate limiting configuration
@@ -53,6 +56,8 @@ app.use('/users', userRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/reviews', reviewRoutes);
+app.use('/transactions', formImageRoutes);
+app.use('/transactions', xmlRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

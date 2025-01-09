@@ -1,0 +1,3 @@
+This is not a real image file.
+It's just a text file to test invalid file type uploads.
+The test should reject this file during image validation.

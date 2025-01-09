@@ -213,6 +213,29 @@ QASE_MODE=testops npx playwright test
 | 8      | Handle Invalid Order Creation          | 1. Attempt to create an order with no items. <br>2. Verify the response status code is `400`.               | Status code `400`. <br>Response contains error message `Invalid order: No items provided`.        | `{ items: [] }`             |
 | 9      | Clean Up Test Data                     | 1. Delete all reviews. <br>2. Delete created orders. <br>3. Delete the test user.                           | All test data is cleaned up successfully.                                                        | Test user, reviews, orders  |
 
+## Test Cases for Upload and Form Data Validation
+
+| Test # | Test Name                                   | Test Steps                                                                                       | Expectation                                                                                     | Test Data                                           |
+|--------|--------------------------------------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| 1      | Upload Valid Image                         | 1. Log in as a user. <br>2. Upload a valid image file.                                           | Status code `200`. <br>Response contains message: `Image uploaded successfully` and valid metadata. | Valid image (`small_image.jpg`)                   |
+| 2      | Upload Image with Invalid File Type        | 1. Log in as a user. <br>2. Upload an invalid file type as an image.                             | Status code `400`. <br>Response contains error: `Invalid file type`.                            | Invalid file (`invalid_image.txt`)                |
+| 3      | Upload Large Image Exceeding Size Limit    | 1. Log in as a user. <br>2. Upload an image that exceeds the size limit.                        | Status code `400`. <br>Response contains error: `Image dimensions too large`.                   | Large image (`large_image.jpg`)                   |
+| 4      | Submit Valid Form Data                     | 1. Log in as a user. <br>2. Submit a form with valid data.                                       | Status code `200`. <br>Response contains message: `Form data received successfully` and valid data. | `{ username: 'johndoe', email: 'john.doe@example.com', age: '30' }` |
+| 5      | Submit Form Data with Invalid Username     | 1. Log in as a user. <br>2. Submit a form with an invalid (too short) username.                 | Status code `400`. <br>Response contains error: `Username must be at least 3 characters`.       | `{ username: 'jo', email: 'john.doe@example.com', age: '30' }`      |
+| 6      | Submit Form Data with Invalid Email        | 1. Log in as a user. <br>2. Submit a form with an invalid email format.                         | Status code `400`. <br>Response contains error: `Invalid email format`.                         | `{ username: 'johndoe', email: 'invalid-email', age: '30' }`        |
+| 7      | Submit Form Data with Invalid Age          | 1. Log in as a user. <br>2. Submit a form with an age outside the valid range.                  | Status code `400`. <br>Response contains error: `Invalid age (must be between 18 and 120)`.     | `{ username: 'johndoe', email: 'john.doe@example.com', age: '10' }` |
+| 8      | Clean Up Test Data                         | 1. Delete the test user created during the tests.                                               | Test user is deleted successfully.                                                             | Test user                                          |
+
+## Test Cases for Advanced XML Processing
+
+| Test # | Test Name                                   | Test Steps                                                                                         | Expectation                                                                                         | Test Data                                                                                     |
+|--------|--------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| 1      | Filter High Priority Items                 | 1. Log in as a user. <br>2. Send high and low priority items. <br>3. Filter high-priority items.   | Status code `200`. <br>Response contains only high-priority items.                                 | High and low priority items                                                                  |
+| 2      | Transform Item Status                      | 1. Log in as a user. <br>2. Send items with different priorities. <br>3. Transform item statuses.  | Status code `200`. <br>High-priority items have `critical` status.                                | Items with `pending` and `active` statuses                                                  |
+| 3      | Validate XML Items                         | 1. Log in as a user. <br>2. Send valid and invalid XML items.                                      | Status code `400`. <br>Response contains error: `Validation failed`. <br>Invalid items are listed. | One valid and one invalid item (e.g., missing name, priority out of range)                  |
+| 4      | XML Content Type and Structure Validation  | 1. Log in as a user. <br>2. Send XML data. <br>3. Validate response content type and structure.    | Status code `200`. <br>Response headers contain `application/xml`. <br>Response XML structure is valid. | XML with valid structure and content                                                        |
+| 5      | Clean Up Test Data                         | 1. Delete the test user created during the tests.                                                  | Test user is deleted successfully.                                                                 | Test user                                                                                    |
+
 <details>
     <summary><b>Click to see API testing detail</b></summary>
 
@@ -257,6 +280,7 @@ project-root/
 │   ├── middleware/
 │   │   ├── auth.js
 │   │   └── validators.js
+│   │   └── xml-parser.js
 │   ├── utils/
 │   │   └── validators.js
 │   ├── admin.routes.js
@@ -265,6 +289,8 @@ project-root/
 │   ├── products.routes.js
 │   └── user.routes.js
 │   └── reviews.routes.js
+│   └── advance-xml.routes.js
+│   └── form-image.routes.js
 ├── .env
 └── server.js
 ```
@@ -292,26 +318,39 @@ project-root/
 │   ├── orderPage.js
 │   ├── productPage.js
 │   ├── userProfilePage.js
+│   ├── formImagetransactionPage.js
+│   ├── XMLTransactionPage.js
 │   ├── data/
 │       └── api/
 |            |- json_payload.json
+│       └── images/
+|            |- small_image.jpg
+|            |- invalid_image.jpg
+|            |- large_image.jpg
 │   ├── tests/
 │       └── api/
 |            |- user_redirection_access.spec.js
 |            |- admin_inventory.spec.js
 |            |- user_order_products.spec.js
 |            |- complex_jsonpath_tests.spec.js
+|            |- advance_xml.spec.js
+|            |- upload_form_data.spec.js
 ```
 
+Note: 
+- ``user_order_products.spec.js`` focus on API testing with all methods (GET, POST, PUT, PATCH, DELTE) with authenticate user JWT token ``(use db)``
+- ``user_redirection_access.spec.js`` focus on privilege usage that only admin can access and verify all unauthorised status code ``(use db)``
+- ``admin_inventory.spec.js`` focus on business logic fill stocks with define threshold (positive, negative value, invalid) ``(use db)``
+- ``complex_jsonpath_tests.spec.js`` focus on how to filter specific value from complex json body to verify 
+- ``advance_xml.spec.js`` focus on how to filter xml and prase xml strcuture to verify value in API response 
+- ``upload_form_data.spec.js`` focus on how to validate file size, upload image file, file type and request body as form-data ``(use memory storage multer library)``
+
 Result after run test each files:
+![user order](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/user_order_product.png?raw=true)
 ![user redirection](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/user_redirection.png?raw=true)
 ![admin inventory](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/admin_inventory.png?raw=true)
-![user order](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/user_order_product.png?raw=true)
-
-Note: 
-- ``user_order_products.spec.js`` focus on API testing with all methods (GET, POST, PUT, PATCH, DELTE) with authenticate user JWT token (normal user)<br/>
-- ``user_redirection_access.spec.js`` focus on privilege usage that only admin can access and verify all unauthorised status code
-- ``admin_inventory.spec.js`` focus on business logic fill stocks with define threshold (positive, negative value, invalid)
-- ``complex_jsonpath_tests.spec.js`` focus on how to filter specific value from complex json body to verify
+![complex inventory](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/complex_json_result.png?raw=true)
+![xml result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/xml_result.png?raw=true)
+![form result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/form_up_result.png?raw=true)
 
 </details>
