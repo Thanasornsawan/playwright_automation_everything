@@ -236,6 +236,15 @@ QASE_MODE=testops npx playwright test
 | 4      | XML Content Type and Structure Validation  | 1. Log in as a user. <br>2. Send XML data. <br>3. Validate response content type and structure.    | Status code `200`. <br>Response headers contain `application/xml`. <br>Response XML structure is valid. | XML with valid structure and content                                                        |
 | 5      | Clean Up Test Data                         | 1. Delete the test user created during the tests.                                                  | Test user is deleted successfully.                                                                 | Test user                                                                                    |
 
+## Test Cases for Book API with Authentication (Graphql)
+
+| Test # | Test Name                                   | Test Steps                                                                                                     | Expectation                                                                                          | Test Data                          |
+|--------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------|
+| 1      | Handle Unauthorized Access with Invalid API Key | 1. Set an invalid API key. <br>2. Attempt to get book details.                                                 | Throws an error with message: `Invalid API key`.                                                    | `invalid-api-key`                 |
+| 2      | Handle Read-Only API Key Permissions        | 1. Set a read-only API key. <br>2. Attempt to perform read and write operations.                                | Read operation succeeds. <br>Write operation fails with message: `Insufficient permissions`.         | `test-api-key-readonly`           |
+| 3      | Complete CRUD Cycle with Valid Admin API Key | 1. Set an admin API key. <br>2. Create a book. <br>3. Retrieve the book. <br>4. Update the book. <br>5. Delete the book. <br>6. Verify deletion. | All operations (create, read, update, delete) succeed. <br>Deleted book is not retrievable.          | `test-api-key-123`, Book payload  |
+| 4      | Complex Filtering with Authentication       | 1. Set an admin API key. <br>2. Create test books. <br>3. Apply filter criteria. <br>4. Verify filter results. | Filtered books meet criteria (e.g., genre, rating, price range, availability). <br>Valid aggregations. | Filter criteria, Book payload     |
+
 <details>
     <summary><b>Click to see API testing detail</b></summary>
 
