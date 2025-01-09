@@ -3,13 +3,6 @@ const { User } = require('../../models');
 const { JWT_SECRET } = process.env;
 
 const handleAuthResponse = (res, shouldRedirect, redirectPath, statusCode, errorMessage, details = {}) => {
-    /*console.log('handleAuthResponse:', {
-        shouldRedirect,
-        redirectPath,
-        statusCode,
-        errorMessage,
-        headers: res.getHeaders()
-    });*/
 
     if (shouldRedirect === true) {
         res.setHeader('Location', redirectPath);
@@ -25,10 +18,6 @@ const handleAuthResponse = (res, shouldRedirect, redirectPath, statusCode, error
 const authenticateToken = async (req, res, next) => {
     try {
         const shouldRedirect = req.headers['x-handle-redirect'] === 'true';
-        /*console.log('authenticateToken called:', {
-            headers: req.headers,
-            shouldRedirect
-        });*/
 
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
@@ -94,10 +83,6 @@ const authenticateToken = async (req, res, next) => {
 const isAdmin = async (req, res, next) => {
     try {
         const shouldRedirect = req.headers['x-handle-redirect'] === 'true';
-        /*console.log('isAdmin check:', {
-            user: req.user,
-            shouldRedirect
-        });*/
 
         if (!req.user || !req.user.isAdmin) {
             return handleAuthResponse(

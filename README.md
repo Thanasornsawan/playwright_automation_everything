@@ -239,6 +239,8 @@ QASE_MODE=testops npx playwright test
 <details>
     <summary><b>Click to see API testing detail</b></summary>
 
+## API testing with Nodejs (express server)
+
 **Setup .env configuration**
 ```sh
 DB_USER=**your_db_user_same_like_docker_setup**
@@ -352,5 +354,54 @@ Result after run test each files:
 ![complex inventory](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/complex_json_result.png?raw=true)
 ![xml result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/xml_result.png?raw=true)
 ![form result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/form_up_result.png?raw=true)
+
+## API testing with Apollo server (Graphql)
+
+The file structue for API test cases:
+
+```
+project-root/
+├── api/
+│   ├── bookPage.js
+│   ├── data/
+│       └── queries/
+│           └── createBook.js
+│           └── deleteBook.js
+│           └── filterBook.js
+│           └── getBook.js
+│           └── updateBook.js
+│   ├── book_payload.json
+│   ├── tests/
+│       └── api/
+|            |- book.spec.js
+```
+
+The file structue for setup API server:
+
+```
+project-root/
+├── src/
+│   ├── middleware/
+│       └── authMiddleware.js   # control all operation to use API key
+│   ├── models/
+│       └── Book.js             # Book entity
+│   ├── resolvers/
+│       └── bookResolvers.js    # GraphQL resolvers
+│   ├── schema/
+│       └── typeDefs.js         # GraphQL schema definitions
+│   ├── services/
+│       └── BookService.js      # Business logic
+│   ├── server.js
+```
+
+command to start server:
+```sh
+node src/server.js
+```
+
+![apollo server](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/apollo_server.png?raw=true)
+
+Result after run test:
+![graphql result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/graphql_result.png?raw=true)
 
 </details>

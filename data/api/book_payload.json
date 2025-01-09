@@ -1,0 +1,145 @@
+{
+    "fiction": {
+        "bookInput": {
+            "title": "The Shadow's Edge",
+            "author": "J.R. Blackwood",
+            "genre": "FICTION",
+            "publishedYear": 2023,
+            "tags": ["fantasy", "adventure", "mystery"],
+            "ratings": [{
+                "userId": "user123",
+                "score": 4.5,
+                "review": "Captivating story",
+                "dateRated": "2023-12-15"
+            }],
+            "isAvailable": true,
+            "publisher": {
+                "id": "pub123",
+                "name": "Skyward Publishing",
+                "country": "USA"
+            },
+            "metadata": {
+                "isbn": "978-3-16-148410-0",
+                "edition": "First Edition",
+                "language": "English",
+                "format": "Hardcover",
+                "pageCount": 456
+            },
+            "pricing": {
+                "retailPrice": 29.99,
+                "discount": 0.15,
+                "currency": "USD"
+            }
+        }
+    },
+    "mystery": {
+        "bookInput": {
+            "title": "Silent Whispers",
+            "author": "Elizabeth Monroe",
+            "genre": "MYSTERY",
+            "publishedYear": 2022,
+            "tags": ["mystery", "thriller", "detective"],
+            "ratings": [
+                {
+                    "userId": "user456",
+                    "score": 4.8,
+                    "review": "Brilliant plot twists",
+                    "dateRated": "2022-11-20"
+                },
+                {
+                    "userId": "user789",
+                    "score": 4.9,
+                    "review": "Couldn't put it down",
+                    "dateRated": "2022-11-25"
+                }
+            ],
+            "isAvailable": true,
+            "publisher": {
+                "id": "pub456",
+                "name": "Mystery House",
+                "country": "UK"
+            },
+            "metadata": {
+                "isbn": "978-1-14-148420-1",
+                "edition": "First Edition",
+                "language": "English",
+                "format": "Paperback",
+                "pageCount": 322
+            },
+            "pricing": {
+                "retailPrice": 19.99,
+                "discount": 0.1,
+                "currency": "USD"
+            }
+        }
+    },
+    "nonFiction": {
+        "bookInput": {
+            "title": "The Digital Revolution",
+            "author": "Dr. Sarah Chen",
+            "genre": "NON_FICTION",
+            "publishedYear": 2021,
+            "tags": ["technology", "business", "innovation"],
+            "ratings": [
+                {
+                    "userId": "user321",
+                    "score": 4.2,
+                    "review": "Insightful analysis",
+                    "dateRated": "2021-08-15"
+                },
+                {
+                    "userId": "user654",
+                    "score": 4.3,
+                    "review": "Well researched",
+                    "dateRated": "2021-09-01"
+                }
+            ],
+            "isAvailable": true,
+            "publisher": {
+                "id": "pub789",
+                "name": "Tech Press",
+                "country": "Germany"
+            },
+            "metadata": {
+                "isbn": "978-2-18-148430-2",
+                "edition": "Second Edition",
+                "language": "English",
+                "format": "Digital",
+                "pageCount": 284
+            },
+            "pricing": {
+                "retailPrice": 24.99,
+                "discount": 0.2,
+                "currency": "USD"
+            }
+        }
+    },
+    "filterOptions": {
+        "filter": {
+            "genres": ["MYSTERY", "FICTION"],
+            "minRating": 4.0,
+            "priceRange": {
+                "min": 10,
+                "max": 30
+            },
+            "availability": true
+        },
+        "pagination": {
+            "page": 1,
+            "pageSize": 10
+        },
+        "sorting": {
+            "field": "publishedYear",
+            "direction": "DESC"
+        },
+        "dateRange": {
+            "start": "2020-01-01",
+            "end": "2024-12-31"
+        },
+        "searchQuery": {
+            "searchTerm": "mystery",
+            "fields": ["title", "author", "tags"],
+            "fuzzyMatch": true
+        }
+    }
+}
