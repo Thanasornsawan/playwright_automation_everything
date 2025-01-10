@@ -134,59 +134,38 @@ test.describe('Book API Tests with Authentication', () => {
   test('complex filtering with authentication', async () => {
     bookAPI.setApiKey('test-api-key-123');
 
-    // Create test books
-    //console.log('Creating mystery book with payload:', JSON.stringify(bookPayload.mystery.bookInput, null, 2));
-    const mysteryBook = await bookAPI.createBook({ bookInput: bookPayload.mystery.bookInput });
-    //console.log('Created mystery book:', JSON.stringify(mysteryBook, null, 2));
+    // Create both mystery and non-fiction books
+    console.log('Creating test books...');
+    await Promise.all([
+      bookAPI.createBook({ bookInput: bookPayload.mystery.bookInput }),
+      bookAPI.createBook({ bookInput: bookPayload.nonFiction.bookInput })
+    ]);
 
-    //console.log('Creating non-fiction book with payload:', JSON.stringify(bookPayload.nonFiction.bookInput, null, 2));
-    const nonFictionBook = await bookAPI.createBook({ bookInput: bookPayload.nonFiction.bookInput });
-    //console.log('Created non-fiction book:', JSON.stringify(nonFictionBook, null, 2));
-
-    // Wait a moment to ensure books are created
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const filterCriteria = {
-      filter: {
-        genres: [mysteryBook.genre], // Use actual genre from created book
-        minRating: 4.0,
-        priceRange: {
-          min: 10,
-          max: 30
-        },
-        availability: true
-      },
-      pagination: {
-        page: 1,
-        pageSize: 10
-      },
-      sorting: {
-        field: 'publishedYear',
-        direction: 'DESC'
-      },
-      dateRange: {
-        start: '2020-01-01',
-        end: '2024-12-31'
-      },
-      searchQuery: {
-        searchTerm: mysteryBook.title.toLowerCase(),
-        fields: ['title', 'author', 'tags'],
-        fuzzyMatch: true
-      }
-    };
-
-    //console.log('Applying filter criteria:', JSON.stringify(filterCriteria, null, 2));
-    const filterResponse = await bookAPI.filterBooks(filterCriteria);
-    //console.log('Filter response:', JSON.stringify(filterResponse, null, 2));
-
+    // Use the filterOptions directly from our payload
+    const filterResponse = await bookAPI.filterBooks(bookPayload.filterOptions);
+    
+    // Verify the response
     expect(filterResponse.items).toBeDefined();
     expect(filterResponse.items.length).toBeGreaterThan(0);
     
-    // Verify filter results
+    // Verify each book matches our filter criteria
     filterResponse.items.forEach(book => {
-      expect(filterCriteria.filter.genres).toContain(book.genre);
-      expect(book.averageRating).toBeGreaterThanOrEqual(filterCriteria.filter.minRating);
+      // Check genre is either MYSTERY or FICTION
+      expect(bookPayload.filterOptions.filter.genres).toContain(book.genre);
+      
+      // Check rating is at least 4.0
+      expect(book.averageRating).toBeGreaterThanOrEqual(
+        bookPayload.filterOptions.filter.minRating
+      );
+      
+      // Check availability
       expect(book.isAvailable).toBe(true);
+      
+      // Check publish year is within date range
+      const publishYear = new Date(book.publishedYear, 0);
+      const startDate = new Date(bookPayload.filterOptions.dateRange.start);
+      const endDate = new Date(bookPayload.filterOptions.dateRange.end);
+      expect(publishYear >= startDate && publishYear <= endDate).toBeTruthy();
     });
 
     expect(filterResponse.pageInfo.totalCount).toBeGreaterThan(0);
