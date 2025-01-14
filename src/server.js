@@ -18,18 +18,35 @@ async function startServer() {
 
     const bookService = new BookService();
     const resolvers = createBookResolvers(bookService);
-
-    // Create Apollo Server
-    const server = new ApolloServer({
+     
+     const server = new ApolloServer({
         typeDefs,
         resolvers,
-        context: ({ req }) => {
-            // Pass API key details to resolvers
+        formatError: (err) => {
+            // Handle GraphQL validation errors for inputs
+            //console.log('Error:', err);
+            if (err.extensions?.code === 'BAD_USER_INPUT' || 
+                err.message.includes('Variable "$bookInput"')) {
+                return {
+                    message: 'Book creation requires valid input data',
+                    code: 'VALIDATION_ERROR',
+                    field: 'bookInput'
+                };
+            }
+            
+            const error = err.originalError || err;
             return {
-                apiKeyDetails: req.apiKeyDetails
+                message: error.message,
+                code: error.extensions?.code || error.code || 'INTERNAL_ERROR',
+                field: error.extensions?.field || error.field
             };
-        }
-    });
+        },
+        context: ({ req, res }) => ({
+            apiKeyDetails: req.apiKeyDetails,
+            req,
+            res
+        })
+     });
 
     await server.start();
 

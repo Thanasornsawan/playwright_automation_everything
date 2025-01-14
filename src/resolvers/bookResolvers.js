@@ -1,69 +1,195 @@
-function calculateAverageRating(ratings) {
-    if (!ratings || ratings.length === 0) return null;
-    return ratings.reduce((sum, rating) => sum + rating.score, 0) / ratings.length;
-  }
-  
-  function calculateFinalPrice(pricing) {
-    if (!pricing || !pricing.retailPrice) return 0;
-    const discount = pricing.discount || 0;
-    return pricing.retailPrice * (1 - discount);
-  }
-  
-  function createBookResolvers(bookService) {
-    return {
-      Book: {
-        averageRating: (book) => calculateAverageRating(book.ratings),
-        totalRatings: (book) => book.ratings?.length || 0,
-        ratings: (book, { limit }) => {
-          if (limit && book.ratings) {
-            return book.ratings.slice(0, limit);
-          }
-          return book.ratings || [];
-        }
-      },
-      Pricing: {
-        finalPrice: (pricing) => calculateFinalPrice(pricing)
-      },
-      Query: {
-        books: (_, { filter, pagination, sort, ratingThreshold, dateRange, searchQuery }) => {
-          return bookService.filterBooks(
-            filter,
-            pagination,
-            sort,
-            ratingThreshold,
-            dateRange,
-            searchQuery
-          );
-        },
-        book: (_, { id }) => bookService.findById(id)
-      },
-      Mutation: {
-        createBook: (_, { input }) => {
-          return bookService.create(input);
-        },
-        updateBook: (_, { id, input }) => {
-          return bookService.update(id, input);
-        },
-        deleteBook: (_, { id, softDelete, reason }) => {
-          const success = bookService.delete(id);
-          if (!success) {
-            throw new Error('Book not found');
-          }
-          return {
-            success: true,
-            message: 'Book successfully deleted',
-            deletedBookId: id,
-            timestamp: new Date().toISOString(),
-            deletionDetails: {
-              deletedBy: 'system',
-              deletionType: softDelete ? 'soft' : 'hard',
-              reason: reason || 'Not specified',
-              canBeRestored: softDelete || false
+const { ErrorCodes, BookError } = require('../types/errors');
+
+function createBookResolvers(bookService) {
+   return {
+       Book: {
+           averageRating: (book) => {
+               try {
+                   return book.ratings?.length ? book.getAverageRating() : 0;
+               } catch (error) {
+                   throw new BookError(
+                       'Error calculating average rating',
+                       ErrorCodes.INTERNAL_ERROR,
+                       'ratings'
+                   );
+               }
+           },
+           totalRatings: (book) => {
+               try {
+                   return book.getTotalRatings();
+               } catch (error) {
+                   throw new BookError(
+                       'Error calculating total ratings',
+                       ErrorCodes.INTERNAL_ERROR,
+                       'ratings'
+                   );
+               }
+           },
+           pricing: (book) => {
+               try {
+                   return {
+                       ...book.pricing,
+                       finalPrice: book.getFinalPrice()
+                   };
+               } catch (error) {
+                   throw new BookError(
+                       'Error calculating final price',
+                       ErrorCodes.INTERNAL_ERROR,
+                       'pricing'
+                   );
+               }
+           }
+       },
+       Query: {
+           books: async (_, args, { res }) => {
+               try {
+                   const result = await bookService.filterBooks(
+                       args.filter,
+                       args.pagination || { page: 1, pageSize: 10 }, // Add default pagination
+                       args.sort,
+                       args.ratingThreshold,
+                       args.dateRange,
+                       args.searchQuery
+                   );
+                   //console.log('books resolver result:', result);
+                   return {
+                    data: {
+                        items: result.data.items,
+                        pageInfo: result.data.pageInfo,
+                        aggregations: result.data.aggregations
+                    },
+                    error: null
+                };
+               } catch (error) {
+                   console.log('Error in books resolver:', error);
+                   if (error instanceof BookError) {
+                       const statusCode = BookError.mapErrorToStatus(error.code);
+                       res?.status(statusCode);
+                       return {
+                           data: null, 
+                           error: {
+                               message: error.message,
+                               code: error.code,
+                               field: error.field
+                           }
+                       };
+                   }
+                   throw error;
+               }
+           },
+           book: async (_, { id }, { res }) => {
+               try {
+                   const book = await bookService.findById(id);
+                   return {
+                       data: book.data,
+                       error: null
+                   };
+               } catch (error) {
+                   if (error instanceof BookError) {
+                       const statusCode = BookError.mapErrorToStatus(error.code);
+                       res?.status(statusCode);
+                       return {
+                           data: null,
+                           error: {
+                               message: error.message,
+                               code: error.code,
+                               field: error.field
+                           }
+                       };
+                   }
+                   throw error;
+               }
+           }
+       },
+       Mutation: {
+           createBook: async (_, { input }, { res }) => {
+               try {
+                const book = await bookService.create(input);
+                res?.status(201);
+                return {
+                    data: book.data,
+                    error: null
+                };
+            } catch (error) {
+                if (error instanceof BookError) {
+                    const statusCode = BookError.mapErrorToStatus(error.code);
+                    res?.status(statusCode);
+                    return {
+                        data: null,
+                        error: {
+                            message: error.message,
+                            code: error.code,
+                            field: error.field
+                        }
+                    };
+                }
+                throw error;
             }
-          };
-        }
-      }
-    };
-  }
-  
-  module.exports = { createBookResolvers };
+           },
+           updateBook: async (_, { id, input }, { res }) => {
+               try {
+                   const book = await bookService.update(id, input);
+                   return {
+                       data: book.data,
+                       error: null
+                   };
+               } catch (error) {
+                   if (error instanceof BookError) {
+                       const statusCode = BookError.mapErrorToStatus(error.code);
+                       res?.status(statusCode);
+                       return {
+                           data: null,
+                           error: {
+                               message: error.message,
+                               code: error.code,
+                               field: error.field
+                           }
+                       };
+                   }
+                   throw error;
+               }
+           },
+           deleteBook: async (_, { id, softDelete, reason }, { res }) => {
+
+            //console.log('deleteBook called with:', { id, softDelete, reason });
+
+            try {
+                const result = await bookService.delete(id);
+                //console.log('deleteBook result:', result);
+                if (!result.data.success) {
+                    throw new BookError('Book not found', ErrorCodes.NOT_FOUND, 'id');
+                }
+                return {
+                    success: true,
+                    message: 'Book deleted successfully',
+                    deletedBookId: id,
+                    timestamp: new Date().toISOString(),
+                    deletionDetails: {
+                        deletedBy: 'system',  
+                        deletionType: softDelete ? 'soft' : 'hard',
+                        reason: reason || 'Not specified',
+                        canBeRestored: softDelete || false
+                    },
+                    error: null
+                };
+            } catch (error) {
+                //console.error('Error in deleteBook resolver:', error);
+                return {
+                    success: false,
+                    message: error.message,
+                    deletedBookId: id,
+                    timestamp: new Date().toISOString(),
+                    deletionDetails: null,
+                    error: {
+                        message: error.message,
+                        code: error.code || 'INTERNAL_ERROR',
+                        field: error.field || null
+                    }
+                };
+            }
+         }
+       }
+   };
+}
+
+module.exports = { createBookResolvers };

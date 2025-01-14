@@ -380,9 +380,21 @@ project-root/
 │           └── getBook.js
 │           └── updateBook.js
 │   ├── book_payload.json
-│   ├── tests/
-│       └── api/
-|            |- book.spec.js
+├── tests/
+│   ├── api/
+│   │   ├── book_management/
+│   │   │   ├── auth/ 
+│   │   │   │   └── auth.spec.js      
+│   │   │   ├── crud/
+│   │   │   │   └── crud.spec.js          
+│   │   │   ├── validation/
+│   │   │   │   └── validation.spec.js    
+│   │   │   ├── filtering/
+│   │   │   │   └── filtering.spec.js     
+│   │   │   ├── error/
+│   │   │   │   └── error.spec.js         
+│   │   │   └── utils/
+│   │   │       └── test.setup.js
 ```
 
 The file structue for setup API server:
@@ -391,16 +403,18 @@ The file structue for setup API server:
 project-root/
 ├── src/
 │   ├── middleware/
-│       └── authMiddleware.js   # control all operation to use API key
+│   │   └── authMiddleware.js   # control all operation to use API key
 │   ├── models/
-│       └── Book.js             # Book entity
+│   │   └── Book.js             # Book entity
 │   ├── resolvers/
-│       └── bookResolvers.js    # GraphQL resolvers
+│   │   └── bookResolvers.js    # GraphQL resolvers
 │   ├── schema/
-│       └── typeDefs.js         # GraphQL schema definitions
+│   │   └── typeDefs.js         # GraphQL schema definitions
 │   ├── services/
-│       └── BookService.js      # Business logic
-│   ├── server.js
+│   │   └── BookService.js      # Business logic
+│   ├── types/
+│   │   └── errors.js           # define error code  
+│   └── server.js
 ```
 
 command to start server:

@@ -1,4 +1,39 @@
 const typeDefs = `#graphql
+  enum ErrorCode {
+    VALIDATION_ERROR
+    NOT_FOUND
+    PERMISSION_DENIED
+    INTERNAL_ERROR
+    TIMEOUT_ERROR
+  }
+
+  # Single error type for all error cases
+  type GraphQLError {
+    message: String!
+    code: ErrorCode!
+    field: String
+  }
+
+  # Response types with error field
+  type BookResponse {
+    data: Book
+    error: GraphQLError
+  }
+
+  type BooksResponse {
+    data: BookConnection
+    error: GraphQLError
+  }
+
+  type DeletionResponse {
+    success: Boolean
+    message: String
+    deletedBookId: ID
+    timestamp: String
+    deletionDetails: DeletionDetails
+    error: GraphQLError
+  }
+
   enum Genre {
     FICTION
     NON_FICTION
@@ -210,30 +245,22 @@ const typeDefs = `#graphql
     canBeRestored: Boolean!
   }
 
-  type DeletionResponse {
-    success: Boolean!
-    message: String
-    deletedBookId: ID!
-    timestamp: String!
-    deletionDetails: DeletionDetails
-  }
-
   type Query {
     books(
       filter: BookFilterInput,
-      pagination: PaginationInput!,
+      pagination: PaginationInput,
       sort: BookSortingInput,
       ratingThreshold: Float,
       dateRange: DateRangeInput,
       searchQuery: SearchQueryInput
-    ): BookConnection!
+    ): BooksResponse!
     
-    book(id: ID!): Book
+    book(id: ID!): BookResponse!
   }
 
   type Mutation {
-    createBook(input: BookInput!): Book!
-    updateBook(id: ID!, input: BookUpdateInput!): Book!
+    createBook(input: BookInput!): BookResponse!
+    updateBook(id: ID!, input: BookUpdateInput!): BookResponse!
     deleteBook(id: ID!, softDelete: Boolean, reason: String): DeletionResponse!
   }
 `;

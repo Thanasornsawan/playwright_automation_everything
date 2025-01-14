@@ -8,25 +8,49 @@ class BookPage {
     constructor(request) {
         this.request = request;
         this.endpoint = 'http://localhost:4000/graphql';
-        this.apiKey = 'test-api-key-123';
+        this.apiKey = null;
+        this.defaultTimeout = 5000;
     }
 
     setApiKey(apiKey) {
+        if (!apiKey) {
+            throw new Error('API key is required');
+        }
         this.apiKey = apiKey;
     }
 
     extractError(data, response) {
-        if (response.status === 403) {
-            const errorMessage = data.errors?.[0]?.message;
-            if (errorMessage?.includes('Insufficient permissions')) {
-                return 'Insufficient permissions';
-            }
-            return 'Invalid API key';
+        if (data.errors?.[0]?.extensions) {
+            const error = data.errors[0];
+            return {
+                message: error.message,
+                code: error.extensions.code,
+                field: error.extensions.field
+            };
         }
-        return data.errors?.[0]?.message || response.statusText();
+
+        // Handle HTTP errors
+        switch(response.status()) {
+            case 400:
+                return { message: 'Bad Request', code: 'VALIDATION_ERROR' };
+            case 401:
+                return { message: 'Authentication required', code: 'UNAUTHORIZED' };
+            case 403:
+                return { message: data.errors?.[0]?.message || 'Invalid API key', code: 'FORBIDDEN' };
+            case 404:
+                return { message: 'Resource not found', code: 'NOT_FOUND' };
+            case 408:
+                return { message: `Operation timeout: exceeded ${this.defaultTimeout}ms`, code: 'TIMEOUT_ERROR' };
+            default:
+                return { message: 'Internal server error', code: 'INTERNAL_ERROR' };
+        }
     }
 
     async sendQuery(query, variables = {}) {
+        if (!this.apiKey) {
+            throw new Error('API key must be set before making requests');
+        }
+
         try {
             const response = await this.request.post(this.endpoint, {
                 headers: {
@@ -36,56 +60,85 @@ class BookPage {
                 data: {
                     query,
                     variables
-                }
+                },
+                timeout: this.defaultTimeout
             });
             
             const data = await response.json();
+            const status = response.status();
+            //console.log('Response status:', response.status());
+            //console.log('Response data:', JSON.stringify(data, null, 2));
             
-            // Don't throw error for averageRating calculation errors
-            if (data.errors && !data.errors[0]?.message?.includes('getAverageRating')) {
-                throw new Error(this.extractError(data, response));
-            }
-
             if (!response.ok()) {
-                throw new Error(this.extractError(data, response));
+                return {
+                    data: null,
+                    error: this.extractError(data, response),
+                    status
+                };
             }
-            
-            return data;
+    
+            if (data.errors) {
+                const error = data.errors[0];
+                return {
+                    data: null,
+                    error: {
+                        message: error.message,
+                        code: error.code || error.extensions?.code ||  'INTERNAL_ERROR',
+                        field: error.field || error.extensions?.field
+                    },
+                    status
+                };
+            }
+    
+            return { data: data.data, error: null, status };
         } catch (error) {
-            if (error.message === 'Invalid API key' || 
-                error.message === 'Insufficient permissions') {
-                throw error;
+            
+            if (error.message.includes('Request timed out')) {
+                return {
+                    data: null,
+                    error: {
+                        message: `Operation timeout: exceeded ${this.defaultTimeout}ms`,
+                        code: 'TIMEOUT_ERROR'
+                    }
+                };
             }
-            throw error;
+            return {
+                data: null,
+                error: {
+                    message: error.message,
+                    code: 'INTERNAL_ERROR'
+                }
+            };
         }
     }
 
+    // CRUD methods remain the same but now correctly handle the response structure
     async createBook(bookData) {
-        const { data } = await this.sendQuery(CREATE_BOOK, bookData);
-        return data.createBook;
+        const { data, error } = await this.sendQuery(CREATE_BOOK, bookData);
+        return error ? Promise.reject(error) : data.createBook;
     }
 
     async getBook(params) {
-        const { data } = await this.sendQuery(GET_BOOK, params);
-        return data.book;
+        const { data, error } = await this.sendQuery(GET_BOOK, params);
+        return error ? Promise.reject(error) : data.book;
     }
 
     async updateBook({ bookId, updateData }) {
-        const { data } = await this.sendQuery(UPDATE_BOOK, {
+        const { data, error } = await this.sendQuery(UPDATE_BOOK, {
             bookId,
             updateData
         });
-        return data.updateBook;
+        return error ? Promise.reject(error) : data.updateBook;
     }
 
     async deleteBook(params) {
-        const { data } = await this.sendQuery(DELETE_BOOK, params);
-        return data.deleteBook;
+        const { data, error } = await this.sendQuery(DELETE_BOOK, params);
+        return error ? Promise.reject(error) : data.deleteBook;
     }
 
     async filterBooks(filterCriteria) {
-        const { data } = await this.sendQuery(FILTER_BOOKS, filterCriteria);
-        return data.books;
+        const { data, error } = await this.sendQuery(FILTER_BOOKS, filterCriteria);
+        return error ? Promise.reject(error) : data.books;
     }
 }
 
