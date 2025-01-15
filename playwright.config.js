@@ -12,7 +12,7 @@ const config = {
   reporter: [
     ["list"],
     ['playwright-ctrf-json-reporter', {outputFile: 'test-report.json', outputDir: 'report-results',}],
-    ['html', { outputDir: 'html-report' }],
+    ['html', { open: 'never' }],
     ["allure-playwright"],
     ['@zealteam/testrail-reporter'],
     [
