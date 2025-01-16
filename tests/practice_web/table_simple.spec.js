@@ -57,16 +57,31 @@ test('Shopping List - Browser Evaluate Approach', async ({ page }) => {
 test('Present/Absent - Locator Approach', async ({ page }) => {
     await page.goto('https://letcode.in/table');
     
-    // Find the row containing 'Raj' using filter
-    const rajRow = page.locator('#myTable tbody tr')
-        .filter({ hasText: 'Raj' });
+    // First, find all rows and get the index of the row containing 'Raj'
+    const rows = page.locator('#simpletable tr');
+    const count = await rows.count();
+    let rajRowIndex = -1;
     
-    // Find and click checkbox within that row
-    const checkbox = rajRow.locator('input[type="checkbox"]');
-    await checkbox.click();
+    // Iterate through rows to find 'Raj'
+    for (let i = 0; i < count; i++) {
+        const rowText = await rows.nth(i).textContent();
+        if (rowText.includes('Raj')) {
+            rajRowIndex = i;
+            break;
+        }
+    }
     
-    // Verify checkbox state
-    await expect(checkbox).toBeChecked();
+    // If we found Raj's row, click the checkbox in that row
+    if (rajRowIndex !== -1) {
+        // Get the checkbox in the Present column of Raj's row
+        const checkbox = rows.nth(rajRowIndex).locator('input[type="checkbox"]');
+        await checkbox.click();
+        
+        // Verify the checkbox is checked
+        await expect(checkbox).toBeChecked();
+    } else {
+        throw new Error("Could not find row containing 'Raj'");
+    }
 });
 
 // Approach 2: Using role selectors for better accessibility
@@ -79,11 +94,12 @@ test('Present/Absent - Role Selectors Approach', async ({ page }) => {
         .filter({ hasText: 'Raj' });
     
     // Click checkbox using role
-    await tableRow
-        .getByRole('checkbox')
-        .click();
-    
-    await expect(tableRow.getByRole('checkbox')).toBeChecked();
+    const checkbox = tableRow
+    .locator('td:nth-child(4)') // Assuming Present/Absent is the 4th column
+    .getByRole('checkbox');
+
+    await checkbox.click();
+    await expect(checkbox).toBeChecked();
 });
 
 /**
@@ -104,46 +120,91 @@ test('Sortable Tables - Basic Comparison', async ({ page }) => {
     }
     
     // Test Name column sorting
-    const nameColumn = page.locator('#advancedtable tbody tr td:nth-child(1)');
+    const dessertHeaderColumn = page.locator('//label[contains(text(), "Sortable")]/following::table[1]//th[1]');
     
     // Sort ascending
-    await page.getByRole('columnheader', { name: 'Name' }).click();
-    const ascValues = await getFirstAndLast(nameColumn);
+    await dessertHeaderColumn.click();
+    const dessertColumn = page.locator('//label[contains(text(), "Sortable")]/following::table[1]//td[1]');
+    const ascValues = await getFirstAndLast(dessertColumn);
+    console.log(ascValues);
     
     // Basic string comparison (A comes before Z)
     expect(ascValues.first < ascValues.last).toBeTruthy();
 });
 
 // Approach 2: Using localeCompare for proper string comparison
-test('Sortable Tables - LocaleCompare Approach', async ({ page }) => {
+test('Sortable Tables - LocaleCompare Approach with XPath', async ({ page }) => {
     await page.goto('https://letcode.in/table');
     
-    // Function to get column values
-    async function getColumnValues(columnIndex) {
-        return await page.locator(`#advancedtable tbody tr td:nth-child(${columnIndex})`)
-            .allTextContents();
+    // This function now takes a column number and returns all values from that column
+    // We use XPath to find the table relative to the "Sortable" label
+    async function getColumnValues(columnNumber) {
+        // Using XPath to get all cells in the specified column
+        const columnCells = page.locator(`//label[contains(text(), "Sortable")]/following::table[1]//td[${columnNumber}]`);
+        return await columnCells.allTextContents();
     }
-    
-    // Test sorting for Name column
-    await page.getByRole('columnheader', { name: 'Name' }).click();
-    const ascendingValues = await getColumnValues(1);
+
+    // Function to get and click a column header by its position
+    async function clickColumnHeader(columnNumber) {
+        const headerLocator = page.locator(`//label[contains(text(), "Sortable")]/following::table[1]//th[${columnNumber}]`);
+        await headerLocator.click();
+        // Add a small wait to allow sorting to complete
+        await page.waitForTimeout(1000);
+    }
+
+    // Test sorting for Dessert column (first column)
+    console.log('Testing Dessert column sorting...');
     
     // Compare first and last values using localeCompare
     // localeCompare returns:
     // - negative number if first string comes before second
     // - positive number if first string comes after second
     // - zero if strings are equal
-    const comparison = ascendingValues[0].localeCompare(ascendingValues[ascendingValues.length - 1]);
-    expect(comparison).toBeLessThan(0); // First value should come before last value
+
+    // Click for ascending sort
+    await clickColumnHeader(1);
+    const ascendingValues = await getColumnValues(1);
+    console.log('Ascending values:', ascendingValues);
     
-    // Click again for descending sort
-    await page.getByRole('columnheader', { name: 'Name' }).click();
+    // Compare first and last values using localeCompare
+    const comparison = ascendingValues[0]
+        .toLowerCase()
+        .localeCompare(ascendingValues[ascendingValues.length - 1].toLowerCase());
+    expect(comparison).toBeLessThan(0);
+    console.log('Ascending sort verified');
+    
+    // Click for descending sort
+    await clickColumnHeader(1);
     const descendingValues = await getColumnValues(1);
+    console.log('Descending values:', descendingValues);
     
-    // In descending order, first value should come after last value
     const descendingComparison = descendingValues[0]
-        .localeCompare(descendingValues[descendingValues.length - 1]);
+        .toLowerCase()
+        .localeCompare(descendingValues[descendingValues.length - 1].toLowerCase());
     expect(descendingComparison).toBeGreaterThan(0);
+    console.log('Descending sort verified');
+
+    // Test sorting for Calories column (second column)
+    console.log('Testing Calories column sorting...');
+    
+    // Click for ascending sort
+    await clickColumnHeader(2);
+    const caloriesAsc = await getColumnValues(2);
+    
+    // For calories, we need to compare numbers, not strings
+    const firstCalorieAsc = parseInt(caloriesAsc[0]);
+    const lastCalorieAsc = parseInt(caloriesAsc[caloriesAsc.length - 1]);
+    expect(firstCalorieAsc).toBeLessThan(lastCalorieAsc);
+    console.log('Calories ascending sort verified');
+    
+    // Click for descending sort
+    await clickColumnHeader(2);
+    const caloriesDesc = await getColumnValues(2);
+    
+    const firstCalorieDesc = parseInt(caloriesDesc[0]);
+    const lastCalorieDesc = parseInt(caloriesDesc[caloriesDesc.length - 1]);
+    expect(firstCalorieDesc).toBeGreaterThan(lastCalorieDesc);
+    console.log('Calories descending sort verified');
 });
 
 // Approach 3: Numeric comparison for age column
@@ -151,16 +212,16 @@ test('Sortable Tables - Numeric Comparison', async ({ page }) => {
     await page.goto('https://letcode.in/table');
     
     // Get age column values
-    const ageColumn = page.locator('#advancedtable tbody tr td:nth-child(2)');
+    const caloriesColumnHeader = page.locator('//label[contains(text(), "Sortable")]/following::table[1]//th[2]');
     
     // Sort ascending
-    await page.getByRole('columnheader', { name: 'Age' }).click();
-    
+    caloriesColumnHeader.click();
+    const caloriesColumn = page.locator('//label[contains(text(), "Sortable")]/following::table[1]//td[2]');
     // Get all ages and compare first vs last
-    const allAges = await ageColumn.allTextContents();
-    const firstAge = parseInt(allAges[0]);
-    const lastAge = parseInt(allAges[allAges.length - 1]);
+    const allCalories = await caloriesColumn.allTextContents();
+    const firstCalories = parseInt(allCalories[0]);
+    const lastCalories = parseInt(allCalories[allCalories.length - 1]);
     
     // In ascending order, first age should be less than last age
-    expect(firstAge).toBeLessThan(lastAge);
+    expect(firstCalories).toBeLessThan(lastCalories);
 });
