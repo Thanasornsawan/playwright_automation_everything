@@ -1,0 +1,39 @@
+{
+    "testCases": [
+        {
+            "name": "Valet Parking - Less than 5 hours",
+            "type": "Valet Parking",
+            "hours": 4
+        },
+        {
+            "name": "Valet Parking - Full day",
+            "type": "Valet Parking",
+            "hours": 24
+        },
+        {
+            "name": "Short-Term Parking - First hour",
+            "type": "Short-Term Parking",
+            "hours": 1
+        },
+        {
+            "name": "Short-Term Parking - Daily maximum",
+            "type": "Short-Term Parking",
+            "hours": 24
+        },
+        {
+            "name": "Long-Term Garage - Weekly rate",
+            "type": "Long-Term Garage Parking",
+            "hours": 168
+        },
+        {
+            "name": "Long-Term Surface - Daily maximum",
+            "type": "Long-Term Surface Parking",
+            "hours": 24
+        },
+        {
+            "name": "Economy Lot - Weekly rate with extra day",
+            "type": "Economy Parking",
+            "hours": 192
+        }
+    ]
+}
