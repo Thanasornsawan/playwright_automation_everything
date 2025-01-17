@@ -5,7 +5,27 @@ class XMLTransactionPage {
         this.apiContext = apiContext;
         this.baseUrl = baseUrl;
     }
-
+    /*
+    This function converts JavaScript objects into XML format. For example, if you pass:
+    {
+        operation: 'filter-high-priority',
+        items: [{
+            id: '1',
+            name: 'Critical Task',
+            status: 'active',
+            priority: 9,
+            metadata: { group: 'A' }
+        }]
+    }
+    It creates XML like:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <request type="filter-high-priority">
+        <item id="1" status="active" priority="9">
+            <name>Critical Task</name>
+            <metadata>{"group":"A"}</metadata>
+        </item>
+    </request>
+    */
     // Build complex XML with attributes and nested elements
     buildAdvancedXML(operation, items) {
         const xmlItems = items.map(item => {
@@ -40,22 +60,44 @@ class XMLTransactionPage {
         });
     
         //console.log('Response status:', response.status());
-        const responseText = await response.text();
+        //const responseText = await response.text();
         //console.log('Response body:', responseText);
-    
         return response;
     }
 
     // Utility method to parse XML response
+    /*
+    With parseString function from the xml2js library
+    input:
+    <item status="active">
+        <name>Task 1</name>
+    </item>
+    output:
+    {
+        item: {
+            status: 'active',
+            name: 'Task 1'
+        }
+    }
+    Without these options, it would parse to:
+    {
+        item: [{
+            $: {
+                status: ['active']
+            },
+            name: ['Task 1']
+        }]
+    }
+    */
     async parseXMLResponse(response) {
         return new Promise((resolve, reject) => {
             parseString(response, { 
-                trim: true, 
-                explicitArray: false,
-                mergeAttrs: true,
-                attrkey: '$',
-                charkey: '_',
-                valueProcessors: [
+                trim: true,               // Remove whitespace around text
+                explicitArray: false,     // Don't force everything into arrays
+                mergeAttrs: true,         // Move attributes into the object itself
+                attrkey: '$',             // Store attributes under '$' key
+                charkey: '_',             // Store text content under '_' key
+                valueProcessors: [        // Custom processing functions
                     function(value, name) {
                         // Try to parse metadata as JSON
                         if (name === 'metadata' && typeof value === 'string') {
