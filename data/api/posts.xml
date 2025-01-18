@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<posts>
+    <post userId="1">
+        <title>Test Post 1</title>
+        <body>This is the body of test post 1</body>
+    </post>
+    <post userId="2">
+        <title>Test Post 2</title>
+        <body>This is the body of test post 2</body>
+    </post>
+</posts>
