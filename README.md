@@ -29,6 +29,7 @@ project-root/
 │               ├── productFeature.js
 │   ├── utils/
 │       └── pdfUtils.js
+│       └── otpUtils.js
 │   ├── data/
 │       └── tool_shop/
 |            |- userData.json
@@ -250,13 +251,17 @@ I wrote step by step on this blog [Playwright with Azure Devops Pipeline (Self-h
 ![slack not](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/slack_noti.png?raw=true)
 
 </details>
+<br/>
 
 # Playwright API testing
 
 <details>
     <summary><b>Click to see API testing detail</b></summary>
 
-## API testing with Nodejs (express server)
+## API testing with Node.js (express server)
+
+<details>
+    <summary>Click to see detail API testing with Node.js server</summary>
 
 **Setup .env configuration**
 ```sh
@@ -372,7 +377,13 @@ Result after run test each files:
 ![xml result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/xml_result.png?raw=true)
 ![form result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/form_up_result.png?raw=true)
 
+</details>
+<br/>
+
 ## API testing with Apollo server (Graphql)
+
+<details>
+    <summary>Click to see detail API testing with Apollo server</summary>
 
 The file structue for API test cases:
 
@@ -434,5 +445,5 @@ node src/server.js
 
 Result after run test:
 ![graphql result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/graphql_result.png?raw=true)
-
+</details>
 </details>
