@@ -11,12 +11,56 @@ class ProductDetailPage extends BasePage {
         this.cartQuantity = this.page.locator('[data-test="cart-quantity"]')
         this.outOfStockLabel = this.page.locator('text=Out of stock');
         this.brandLabel = this.page.locator('[aria-label="brand"]');
+        this.categorylabel = this.page.locator('[aria-label="category"]');
         this.productName = this.page.locator('[data-test="product-name"]');
         this.productPrice = this.page.locator('[data-test="unit-price"]');
         this.addToCartSuccess = this.page.locator('div[role="alert"]', { hasText: 'Product added to shopping cart.' });
         this.favoriteNotAuthorized = this.page.locator('div[role="alert"]', { hasText: 'Unauthorized, can not add product to your favorite list.' });
         this.favouriteDupplicated = this.page.locator('div[role="alert"]', { hasText: 'Product already in your favorites list.' });
         this.favouriteSuccess = this.page.locator('div[role="alert"]', { hasText: 'Product added to your favorites list.' });
+        this.relatedProductcardTitle = this.page.locator('.card-title');
+        this.relatedProductSection = this.page.locator('text=Related products');
+    }
+
+    /**
+     * Get category of current product
+     * @returns {Promise<string>} Category name
+     */
+    async getCategory() {
+        await this.categorylabel.waitFor({ state: 'visible' });
+        return await this.categorylabel.innerText();
+    }
+
+    /**
+     * Get all related product names
+     * @returns {Promise<string[]>} Array of related product names
+     */
+    async getRelatedProductNames() {
+        await this.relatedProductcardTitle.first().waitFor({ state: 'visible' });
+        return await this.relatedProductcardTitle.allInnerTexts();
+    }
+
+    /**
+     * Open a related product in new tab
+     * @param {number} index Index of the related product to open
+     * @returns {Promise<Page>} New page object
+     */
+    async openRelatedProductInNewTab(index) {
+        await this.relatedProductSection.scrollIntoViewIfNeeded();
+        await this.relatedProductcardTitle.nth(index).waitFor({ state: 'visible' });
+        const productCard = this.relatedProductcardTitle.nth(index);
+        await productCard.waitFor({ state: 'visible' });
+        
+        // Create new page promise before clicking
+        const pagePromise = this.page.context().waitForEvent('page');
+        
+        // Click with modifier to open in new tab
+        await productCard.click({ modifiers: ['Meta'] });
+        
+        const newPage = await pagePromise;
+        await newPage.waitForLoadState('networkidle');
+        
+        return newPage;
     }
 
     // Get the current quantity value from the input field

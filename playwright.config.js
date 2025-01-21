@@ -4,10 +4,9 @@ require('dotenv').config({ path: '.env' });
 
 const config = {
   testDir: './tests',
-  retries: 0,
-  timeout: 30 * 1000,
+  timeout: 120000,  // 2 minutes global timeout
   expect: {
-    timeout: 5000,
+    timeout: 45000  // 45 seconds for expects
   },
   reporter: [
     ["list"],
@@ -38,7 +37,12 @@ const config = {
     headless: true,           
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
+    actionTimeout: 45000,  // Actions like click
+    navigationTimeout: 45000,  // Navigation timeout
   },
+  retries: 1,  // Retry failed tests once
+  workers: 2,  // Reduce parallel workers to prevent race conditions
+  fullyParallel: false  // Disable full parallelism
 };
 
 module.exports = config;

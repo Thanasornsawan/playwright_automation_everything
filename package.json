@@ -39,6 +39,7 @@
     "negotiator": "^0.6.3",
     "oracledb": "^6.7.1",
     "papaparse": "^5.5.1",
+    "pdf-parse": "^1.1.1",
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
     "playwright-qase-reporter": "^2.0.16",

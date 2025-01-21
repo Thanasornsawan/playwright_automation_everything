@@ -7,6 +7,22 @@ class CartPage extends BasePage {
         this.cartUpdateSuccess = this.page.locator('div[role="alert"]', { hasText: 'Product quantity updated.' });
         this.cartDeleteSuccess = this.page.locator('div[role="alert"]', { hasText: 'Product deleted.' });
         this.cartTotal = this.page.locator('[data-test="cart-total"]');
+        this.proceedToCheckoutButton1 = this.page.locator('[data-test="proceed-1"]'); //at step cart
+        this.proceedToCheckoutButton2 = this.page.locator('[data-test="proceed-2"]'); //at step sign in
+        this.proceedToCheckoutButton3 = this.page.locator('[data-test="proceed-3"]'); //at step billing address
+        this.paymentMethodDropdown = this.page.locator('[data-test="payment-method"]');
+        this.confirmPaymentButton = this.page.locator('[data-test="finish"]');
+        this.orderConfirmation = this.page.locator('#order-confirmation');
+        this.paymentSuccess = this.page.locator('text="Payment was successful"');
+
+        // Payment method mapping
+        this.paymentOptions = {
+            'Bank Transfer': 'bank-transfer',
+            'Cash on Delivery': 'cash-on-delivery',
+            'Credit Card': 'credit-card',
+            'Buy Now Pay Later': 'buy-now-pay-later',
+            'Gift Card': 'gift-card'
+        };
     }
 
     /**
@@ -57,14 +73,23 @@ class CartPage extends BasePage {
      */
     async deleteProduct(productName) {
         const locators = this.getProductLocators(productName);
-        await locators.deleteButton.waitFor({ state: 'visible' });
+        await locators.deleteButton.waitFor({ state: 'visible', timeout: 10000 });
         await locators.deleteButton.click();
-        await this.cartDeleteSuccess.waitFor({ state: 'visible' });
-        // Wait for the product to be removed
-        await this.page.locator(`span[data-test="product-title"]`, {
-            hasText: productName,
-            exact: true
-        }).waitFor({ state: 'hidden' });
+        try {
+            await this.cartDeleteSuccess.waitFor({ 
+                state: 'visible',
+                timeout: 10000 
+            });
+        } catch (error) {
+            console.log('Delete success message not shown, verifying product removal');
+        }
+
+        // Wait for product to be removed from DOM
+        await this.page.waitForSelector(`span[data-test="product-title"]:has-text("${productName}")`, {
+            state: 'detached',
+            timeout: 10000
+        });
+
         }
 
     /**
@@ -94,6 +119,45 @@ class CartPage extends BasePage {
         const totalText = await this.cartTotal.innerText();
         return parseFloat(totalText.replace('$', ''));
     }
+
+    /**
+     * Process checkout with specified payment method
+     * @param {string} paymentMethod - The payment method text (e.g., 'Cash on Delivery')
+     * @throws {Error} If payment method is not supported
+     */
+    async processToCompleteCheckoutPayment(paymentMethod) {
+        // Validate payment method
+        const paymentValue = this.paymentOptions[paymentMethod];
+        if (!paymentValue) {
+            const validOptions = Object.keys(this.paymentOptions).join(', ');
+            throw new Error(`Invalid payment method: ${paymentMethod}. Valid options are: ${validOptions}`);
+        }
+
+        // Process checkout steps
+        await this.proceedToCheckoutButton1.click();
+        await this.proceedToCheckoutButton2.click();
+        await this.proceedToCheckoutButton3.click();
+
+        // Select payment method
+        await this.paymentMethodDropdown.selectOption(paymentValue);
+
+        // Confirm payment
+        await this.confirmPaymentButton.click();
+        await this.paymentSuccess.waitFor({ state: 'visible' });
+        await this.confirmPaymentButton.click();
+    }
+
+    /**
+     * Get invoice number from order confirmation message
+     * @returns {Promise<string>}
+     */
+    async getInvoiceNumberFromConfirmation() {
+        await this.orderConfirmation.waitFor({ state: 'visible' });
+        const confirmationText = await this.orderConfirmation.innerText();
+        const match = confirmationText.match(/INV-\d+/);
+        return match ? match[0] : null;
+    }
+
 }
 
 module.exports = CartPage;

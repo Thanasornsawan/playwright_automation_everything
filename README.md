@@ -1,7 +1,52 @@
 # Self-practice playwright
 
+# Playwright web testing
+
+<details>
+    <summary>Click to see detail about web testing</summary>
+
+## Full automate E2E test cases
+This practice use website https://practicesoftwaretesting.com/ for testing. <br/>
+
+The file structue for tool demo web test cases:
+
+```
+project-root/
+│   ├── web/
+│       └── pages/
+|            |- tool_shop/
+│               ├── basePage.js
+│               ├── cartPage.js
+│               ├── invoiceDetailPage.js
+│               ├── loginPage.js
+│               ├── myInvoicesPage.js
+│               ├── navBarPage.js
+│               ├── productDetailPage.js
+│               ├── registerPage.js
+│               ├── searchPage.js
+│       └── features/
+|            |- tool_shop/
+│               ├── productFeature.js
+│   ├── utils/
+│       └── pdfUtils.js
+│   ├── data/
+│       └── tool_shop/
+|            |- userData.json
+│   ├── tests/
+│       └── tool_shop/
+|            |- cart.spec.js
+|            |- e2e.spec.js
+|            |- product.spec.js
+|            |- search.spec.js
+```
+
+![tool result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/tool_demo_result.png?raw=true)
+
 ## Re-use login state by login API before jump to any pages
 This practice use website https://ecommerce-playground.lambdatest.io/index.php for testing. <br/>
+
+<details>
+    <summary>Click to see detail about using login state by login API</summary>
 At first, we intercept network and check endpoint for login API and payload and then make API request in ``LambdaTestApiUtils.js`` file <br/>
 and then we use ``await page.context().addCookies(apiCookies);`` for add cookie from login API before proceed to any page. <br/>
 In the test script ``lambdatest_product_detail.spec.js``, we only test add product to cart, verify toast popup and total qty in cart<br/>
@@ -9,8 +54,13 @@ In the test script ``lambdatest_product_detail.spec.js``, we only test add produ
 ![lambda ui](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/lambda_product_detail_ui.png?raw=true)
 ![lambda result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/lambda_result.png?raw=true)
 
+</details>
+
 ## Re-use login state by use local storage file before jump to any pages
 This practice use website https://opensource-demo.orangehrmlive.com for testing. <br/>
+
+<details>
+    <summary>Click to see detail about using local storage file login</summary>
 At first, we use admin account go to PIM menu to create different role accounts (In our case is testerQA1, testerQA2) <br/>
 
 ![orangehrm admin](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/orangehrm_admin.png?raw=true)
@@ -37,6 +87,15 @@ Then, in role_test.spec.js, we use the state file
 Think of it as saying "I want all tests using this function to have these special settings"<br/>
 
 ![orangehrm result](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/orangehrm_result.png?raw=true)
+
+</details>
+</details>
+<br/>
+
+# TDD testing with Playwright
+
+<details>
+    <summary>Click to see all TDD testing</summary>
 
 ## Database setup
 **if you use mac M1, you might have problem build docker oracle same me, recommend to use colima start docker**
@@ -92,6 +151,14 @@ Now, you can see postgresql and oracle database running inside Colima like this 
 ![mysql query3](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/mysql_query_result.png?raw=true)
 ![mysql query4](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/query_price_condition.png?raw=true)
 </details>
+
+</details>
+<br/>
+
+# Report integration
+
+<details>
+    <summary>Click to see all reports integration detail</b></summary>
 
 ## Report integrate with TestRail
 using testrail-reporter, see full documentation [testrail-reporter here](https://github.com/zealous-tech/testrail-reporter/tree/main)<br/>
@@ -154,6 +221,15 @@ TESTRAIL_BASE_URL=https://**your_testrail_domain**.testrail.io
 ```sh
 QASE_MODE=testops npx playwright test
 ```
+</details>
+<br/>
+
+# CICD integration
+
+<details>
+    <summary><b>Click to see cicd detail</b></summary>
+## Azure Devops CICD pipeline send slack notification to slack
+I wrote step by step on this blog [Playwright with Azure Devops Pipeline (Self-hosted) and Slack notification](https://medium.com/@wisdomgoody/playwright-with-azure-devops-pipeline-self-hosted-and-slack-notification-e15f5cb96cc1)
 
 ## Github CICD send notification to slack
 **Step 1: Set Up Slack Incoming Webhook**
@@ -173,7 +249,9 @@ QASE_MODE=testops npx playwright test
 ![github cicd](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/github_cicd.png?raw=true)
 ![slack not](https://github.com/Thanasornsawan/Practice_Playwright/blob/main/pictures/slack_noti.png?raw=true)
 
-## Playwright API testing
+</details>
+
+# Playwright API testing
 
 <details>
     <summary><b>Click to see API testing detail</b></summary>

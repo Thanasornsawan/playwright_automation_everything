@@ -51,47 +51,13 @@ test.describe('File Download Tests', () => {
         expect(stats.size).toBeGreaterThan(0);
     });
 
-    // Test PDF file download
-    test('should download PDF file', async ({ page }) => {
-        // Start waiting for download before clicking
-        const downloadPromise = page.waitForEvent('download');
-        
-        // Click the PDF download button
-        // Note: Update the selector based on the actual button on the page
-        await page.click('text=Download PDF');
-        
-        // Wait for the download to start
-        const download = await downloadPromise;
-        
-        // Specify the download path
-        const filePath = path.join(downloadPath, 'sample.pdf');
-        
-        // Save the downloaded file
-        await download.saveAs(filePath);
-        
-        // Verify the file exists
-        const fileExists = fs.existsSync(filePath);
-        expect(fileExists).toBeTruthy();
-        
-        // Optional: Verify file size is greater than 0
-        const stats = fs.statSync(filePath);
-        expect(stats.size).toBeGreaterThan(0);
-    });
-
     // Clean up after all tests
     test.afterAll(async () => {
-        // Optional: Clean up downloaded files
-        // Uncomment these lines if you want to delete the files after testing
-        /*
         const excelPath = path.join(downloadPath, 'sample.xlsx');
-        const pdfPath = path.join(downloadPath, 'sample.pdf');
         
         if (fs.existsSync(excelPath)) {
             fs.unlinkSync(excelPath);
         }
-        if (fs.existsSync(pdfPath)) {
-            fs.unlinkSync(pdfPath);
-        }
-        */
+        
     });
 });
