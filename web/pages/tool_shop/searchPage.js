@@ -79,15 +79,40 @@ class SearchPage extends BasePage {
         await this.priceRangeMin.waitFor({ state: 'visible' });
         await this.priceRangeMax.waitFor({ state: 'visible' });
     
-        // Get the possible range from aria attributes
+        // Get the slider's possible range from its attributes
+        // Default to 0-200 if attributes aren't found
         const minPossible = parseInt(await this.priceRangeMin.getAttribute('aria-valuemin')) || 0;
         const maxPossible = parseInt(await this.priceRangeMax.getAttribute('aria-valuemax')) || 200;
     
-        // If no values provided, generate random values within the possible range
+        // If no specific values are provided, generate random ones
+        // Math.random() always generates a number between 0 and 1 (including 0 but not including 1).
         const targetMin = min ?? Math.floor(Math.random() * (maxPossible / 2));
+        /*
+        1. The ?? is the nullish coalescing operator. It means "use the left value if it's not null/undefined, otherwise use the right value"
+        2. If min is provided (like in your test case where you pass 16), it will use that value
+        3. If min is null, it calculates a random minimum like this:
+            Say maxPossible is 200, maxPossible / 2 is 100
+            Math.random() gives a number like 0.34
+            0.34 * 100 is 34
+            Math.floor(34) rounds down to 34
+            So it picks a random minimum price between 0 and 100
+        */
         const targetMax = max ?? Math.floor((maxPossible + targetMin) / 2 + Math.random() * (maxPossible - targetMin));
+        /*
+        Let's break it down using an example where targetMin is 34:
+
+        1. If max is provided (like in your test case where you pass 110), it will use that value
+        2. If max is null, it calculates a random maximum:
+
+            maxPossible + targetMin is 200 + 34 = 234
+            (234) / 2 is 117 (this sets a midpoint)
+            maxPossible - targetMin is 200 - 34 = 166
+            Math.random() * 166 might give us something like 0.3 * 166 = 49.8
+            Adding these: 117 + 49.8 = 166.8
+            Math.floor(166.8) rounds down to 166
+        */
     
-        // Ensure values are within bounds
+        // // Ensure our target values stay within the allowed range
         const safeMin = Math.max(minPossible, Math.min(targetMin, maxPossible));
         const safeMax = Math.max(safeMin, Math.min(targetMax, maxPossible));
     
@@ -97,31 +122,41 @@ class SearchPage extends BasePage {
         // Move slider to target value using keyboard
         const moveSlider = async (slider, targetValue) => {
             await slider.click(); // Focus the slider
+            // Get the slider's current value
             const currentValue = parseInt(await slider.getAttribute('aria-valuenow'));
+            // Calculate how far and in which direction we need to move
+            /*
+            This is like deciding which direction to move the slider. 
+            Imagine you're at $50 and want to get to $75:
+            difference = 75 - 50 = 25 (positive)
+            Since difference > 0, we need to move right
+            If we were at $75 and wanted $50:
+
+            difference = 50 - 75 = -25 (negative)
+            We'd need to move left
+            */
             const difference = targetValue - currentValue;
             const key = difference > 0 ? 'ArrowRight' : 'ArrowLeft';
             const steps = Math.abs(difference);
             
             //console.log(`Moving slider from ${currentValue} to ${targetValue}`);
+
+            // Move the slider one step at a time
             for (let i = 0; i < steps; i++) {
                 await slider.press(key);
+                // Add a small delay between presses to ensure stability
                 await this.page.waitForTimeout(50);
             }
         };
     
         // Move both sliders to their target positions
+        // Move min first, then max to handle cases where they might overlap
         await moveSlider(this.priceRangeMin, safeMin);
         await moveSlider(this.priceRangeMax, safeMax);
     
         // Wait for UI to reflect the changes
         await this.page.waitForLoadState('networkidle');
         await this.productNames.first().waitFor({ state: 'visible' });
-    
-        // Take a full page screenshot for debugging
-        await this.page.screenshot({ 
-            path: 'price-filter-debug.png',
-            fullPage: true 
-        });
     
         // Get actual prices after filter
         const prices = await this.getSearchResultPrices();
@@ -165,57 +200,54 @@ class SearchPage extends BasePage {
         // Store initial products for comparison
         const initialProducts = await this.productNames.allInnerTexts();
         
-        // First scroll to filter section
+        // Scroll filter section into view
         await this.filterSection.scrollIntoViewIfNeeded();
-        // Then scroll to brand section specifically
         await this.brandSection.scrollIntoViewIfNeeded();
         
         const brandFilter = this.brandCheckbox(brand);
         await brandFilter.waitFor({ state: 'visible' });
+    
+        // Click once to apply the filter
         await brandFilter.click();
     
-        // Retry loop to wait for products to update
+        // Retry loop just waits for update
         let attempts = 0;
         while (attempts < maxAttempts) {
             try {
-                //console.log(`Attempt ${attempts + 1}: Waiting for product list to update`);
-                
                 // Wait for network and animation
                 await this.page.waitForLoadState('networkidle');
                 await this.page.waitForTimeout(1000);
     
-                // Wait for at least one product to be visible
+                // Wait for search results to be visible
                 await this.searchResults.first().waitFor({ state: 'visible' });
     
                 // Get new product list
                 const newProducts = await this.productNames.allInnerTexts();
     
-                // Compare with initial list
+                // Check if the list has changed
                 if (newProducts.length !== initialProducts.length || 
                     JSON.stringify(newProducts) !== JSON.stringify(initialProducts)) {
-                    //console.log('Product list updated successfully');
+                    // Success! List has updated
                     return;
                 }
     
-                console.log('Product list unchanged, retrying...');
+                // If no change yet, just increment attempts and wait longer
                 attempts++;
-                
                 if (attempts < maxAttempts) {
-                    // Try clicking the filter again
-                    await brandFilter.click();
-                    await this.page.waitForTimeout(1000);
+                    // Just wait a bit longer for the update
+                    await this.page.waitForTimeout(2000);
                 }
             } catch (error) {
-                console.log(`Attempt ${attempts + 1} failed:`, error.message);
                 attempts++;
+                console.log(`Attempt ${attempts} failed: ${error.message}`);
                 
                 if (attempts === maxAttempts) {
-                    throw error;
+                    throw new Error(`Failed to filter by brand "${brand}" after ${maxAttempts} attempts: ${error.message}`);
                 }
             }
         }
     
-        throw new Error('Product list did not update after applying brand filter');
+        throw new Error(`Product list did not update after applying ${brand} filter after ${maxAttempts} attempts`);
     }
 
     /**
