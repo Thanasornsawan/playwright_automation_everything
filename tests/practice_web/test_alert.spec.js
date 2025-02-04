@@ -53,7 +53,7 @@ test.describe('Test handle alert', () => {
         await page.waitForSelector("#promptBtn");
         await page.locator("#promptBtn").click();
         await expect(page.locator("#demo")).toHaveText(
-          "Hello thanasornsawan! How are you today?"
+          "Hello Thanasornsawan! How are you today?"
         );
       
         await page.waitForTimeout(5000);
